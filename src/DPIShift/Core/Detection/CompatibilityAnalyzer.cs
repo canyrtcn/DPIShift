@@ -54,10 +54,13 @@ public sealed class CompatibilityAnalyzer
             return new CompatibilityReport
             {
                 Technology = ScalingTech.Unknown,
-                TechnologyBadge = "Bulunamadı",
+                TechnologyBadge = "Not Found",
+                TechnologyBadgeTr = "Bulunamadı",
                 Support = SupportLevel.Unsupported,
-                SummaryTitle = "Uygulama yürütülebilir dosyası bulunamadı",
-                Explanation = "Seçilen .exe dosyasına erişilemiyor veya dosya taşınmış."
+                SummaryTitle = "Application executable not found",
+                SummaryTitleTr = "Uygulama yürütülebilir dosyası bulunamadı",
+                Explanation = "The selected .exe file cannot be accessed or has been moved.",
+                ExplanationTr = "Seçilen .exe dosyasına erişilemiyor veya dosya taşınmış."
             };
         }
 
@@ -99,8 +102,10 @@ public sealed class CompatibilityAnalyzer
                 TechnologyBadge = "DPIShift",
                 Support = SupportLevel.Unsupported,
                 DpiAwarenessLabel = "Per-Monitor V2",
-                SummaryTitle = "DPIShift kendi arayüzünü harici kural ile ölçeklendirmez",
-                Explanation = "DPIShift, diğer uygulamaların DPI ölçeklendirmesini yönetmek için tasarlanmıştır."
+                SummaryTitle = "DPIShift does not apply external scaling rules to itself",
+                SummaryTitleTr = "DPIShift kendi arayüzünü harici kural ile ölçeklendirmez",
+                Explanation = "DPIShift is designed to manage per-application DPI scaling for other desktop applications.",
+                ExplanationTr = "DPIShift, diğer uygulamaların DPI ölçeklendirmesini yönetmek için tasarlanmıştır."
             };
         }
 
@@ -114,13 +119,21 @@ public sealed class CompatibilityAnalyzer
             return new CompatibilityReport
             {
                 Technology = ScalingTech.UwpOrSystemProtected,
-                TechnologyBadge = isUwp ? "UWP / Store Paketi" : "Windows Sistem Bileşeni",
+                TechnologyBadge = isUwp ? "UWP / Store Package" : "Windows System Component",
+                TechnologyBadgeTr = isUwp ? "UWP / Store Paketi" : "Windows Sistem Bileşeni",
                 Support = SupportLevel.Unsupported,
-                DpiAwarenessLabel = "Sistem Korumalı",
+                DpiAwarenessLabel = "System Protected",
+                DpiAwarenessLabelTr = "Sistem Korumalı",
                 SummaryTitle = isUwp
+                    ? "Protected UWP / Microsoft Store application"
+                    : "Protected Windows shell or core system process",
+                SummaryTitleTr = isUwp
                     ? "Korumalı UWP / Microsoft Store uygulaması"
                     : "Kritik Windows kabuk veya sistem işlemi",
                 Explanation = isUwp
+                    ? "Windows Store (AppContainer / CoreWindow) applications inherit scaling directly from the OS compositor and do not allow independent external DPI overrides."
+                    : "To protect system stability, DPIShift does not modify the Windows desktop shell or core operating system processes.",
+                ExplanationTr = isUwp
                     ? "Windows Store (AppContainer / CoreWindow) uygulamaları ölçeklendirmeyi doğrudan işletim sistemi kompozitöründen alır ve dışarıdan bağımsız DPI geçersiz kılmasına izin vermez."
                     : "Sistem kararlılığını korumak amacıyla Windows masaüstü kabuğu ve çekirdek sistem işlemlerine müdahale edilmez."
             };
@@ -153,9 +166,12 @@ public sealed class CompatibilityAnalyzer
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.ChromiumFlags,
                 DpiAwarenessLabel = "Per-Monitor V2",
-                SummaryTitle = "Gerçek vektörel arayüz ölçeklendirmesi tam destekleniyor",
-                Explanation = "Electron tabanlı bu uygulama Chromium görüntüleme motorunu kullanır. Yalnızca içerik değil; kenar çubukları, sekmeler, menüler ve tüm arayüz bileşenleri bulanıklaşmadan hedef yüzdede vektörel olarak çizilir.",
-                MechanismDescription = "Chromium cihaz ölçek çarpanı (--high-dpi-support=1 --force-device-scale-factor) ile başlatma ve kısayol entegrasyonu.",
+                SummaryTitle = "Full vector interface scaling is supported",
+                SummaryTitleTr = "Gerçek vektörel arayüz ölçeklendirmesi tam destekleniyor",
+                Explanation = "This Electron application uses the Chromium rendering engine. Sidebars, tabs, menus, icons, and all UI components render crisply at the target scale without blurring.",
+                ExplanationTr = "Electron tabanlı bu uygulama Chromium görüntüleme motorunu kullanır. Yalnızca içerik değil; kenar çubukları, sekmeler, menüler ve tüm arayüz bileşenleri bulanıklaşmadan hedef yüzdede vektörel olarak çizilir.",
+                MechanismDescription = "Chromium device scale factor (--high-dpi-support=1 --force-device-scale-factor) and shortcut integration.",
+                MechanismDescriptionTr = "Chromium cihaz ölçek çarpanı (--high-dpi-support=1 --force-device-scale-factor) ile başlatma ve kısayol entegrasyonu.",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = true
             };
@@ -167,13 +183,17 @@ public sealed class CompatibilityAnalyzer
             return new CompatibilityReport
             {
                 Technology = ScalingTech.Chromium,
-                TechnologyBadge = "Chromium Tarayıcı",
+                TechnologyBadge = "Chromium Browser",
+                TechnologyBadgeTr = "Chromium Tarayıcı",
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.ChromiumFlags,
                 DpiAwarenessLabel = "Per-Monitor V2",
-                SummaryTitle = "Gerçek tarayıcı arayüzü ve içerik ölçeklendirmesi tam destekleniyor",
-                Explanation = "Sekme çubuğu, adres çubuğu, yer işaretleri, menüler, geliştirici araçları ve web sayfalarının tamamı gerçek HiDPI vektörel ölçekte çalışır (sayfa içi yakınlaştırmadan farklı olarak tüm tarayıcı arayüzünü ölçekler). Değişiklik için arka planda açık tüm örneklerinin kapatılıp yeniden başlatılması gerekir.",
-                MechanismDescription = "Chromium yerel cihaz ölçeği (--high-dpi-support=1 --force-device-scale-factor) ve kısayol entegrasyonu.",
+                SummaryTitle = "Full browser interface & content HiDPI scaling is supported",
+                SummaryTitleTr = "Gerçek tarayıcı arayüzü ve içerik ölçeklendirmesi tam destekleniyor",
+                Explanation = "The tab strip, address bar, bookmarks bar, menus, developer tools, and web pages all render at true HiDPI vector scale (unlike in-page zoom, this scales the entire browser UI). All running instances must be restarted for changes to take effect.",
+                ExplanationTr = "Sekme çubuğu, adres çubuğu, yer işaretleri, menüler, geliştirici araçları ve web sayfalarının tamamı gerçek HiDPI vektörel ölçekte çalışır (sayfa içi yakınlaştırmadan farklı olarak tüm tarayıcı arayüzünü ölçekler). Değişiklik için arka planda açık tüm örneklerinin kapatılıp yeniden başlatılması gerekir.",
+                MechanismDescription = "Native Chromium device scale factor (--high-dpi-support=1 --force-device-scale-factor) and shortcut integration.",
+                MechanismDescriptionTr = "Chromium yerel cihaz ölçeği (--high-dpi-support=1 --force-device-scale-factor) ve kısayol entegrasyonu.",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = true
             };
@@ -190,9 +210,12 @@ public sealed class CompatibilityAnalyzer
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.ChromiumFlags,
                 DpiAwarenessLabel = "Per-Monitor V2",
-                SummaryTitle = "CEF tabanlı vektörel arayüz ölçeklendirmesi destekleniyor",
-                Explanation = "Uygulama gömülü Chromium (CEF) arayüz motorunu kullanıyor. Tüm arayüz bileşenleri gerçek cihaz ölçek çarpanıyla keskin şekilde ölçeklendirilebilir.",
-                MechanismDescription = "CEF cihaz ölçek çarpanı (--high-dpi-support=1 --force-device-scale-factor) ile başlatma.",
+                SummaryTitle = "CEF-based vector interface scaling is supported",
+                SummaryTitleTr = "CEF tabanlı vektörel arayüz ölçeklendirmesi destekleniyor",
+                Explanation = "This application uses the Chromium Embedded Framework (CEF). All UI components scale crisply using the native device scale factor.",
+                ExplanationTr = "Uygulama gömülü Chromium (CEF) arayüz motorunu kullanıyor. Tüm arayüz bileşenleri gerçek cihaz ölçek çarpanıyla keskin şekilde ölçeklendirilebilir.",
+                MechanismDescription = "CEF device scale factor (--high-dpi-support=1 --force-device-scale-factor).",
+                MechanismDescriptionTr = "CEF cihaz ölçek çarpanı (--high-dpi-support=1 --force-device-scale-factor) ile başlatma.",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = true
             };
@@ -210,9 +233,12 @@ public sealed class CompatibilityAnalyzer
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.EclipseIniOrArgs,
                 DpiAwarenessLabel = "Per-Monitor HiDPI",
-                SummaryTitle = "Eclipse / SWT vektörel arayüz ölçeklendirmesi destekleniyor",
-                Explanation = "SWT ve Java2D ölçeklendirme parametreleri üzerinden menüler, simgeler, veri tabloları ve düzenleyiciler bağımsız yüzdede ölçeklendirilir.",
-                MechanismDescription = "Equinox başlatıcı parametreleri (--launcher.appendVmargs -vmargs -Dswt.autoScale & -Dsun.java2d.uiScale).",
+                SummaryTitle = "Eclipse / SWT vector interface scaling is supported",
+                SummaryTitleTr = "Eclipse / SWT vektörel arayüz ölçeklendirmesi destekleniyor",
+                Explanation = "Menus, icons, data grids, and editors scale independently via SWT and Java2D HiDPI scaling parameters.",
+                ExplanationTr = "SWT ve Java2D ölçeklendirme parametreleri üzerinden menüler, simgeler, veri tabloları ve düzenleyiciler bağımsız yüzdede ölçeklendirilir.",
+                MechanismDescription = "Equinox launcher arguments (--launcher.appendVmargs -vmargs -Dswt.autoScale & -Dsun.java2d.uiScale).",
+                MechanismDescriptionTr = "Equinox başlatıcı parametreleri (--launcher.appendVmargs -vmargs -Dswt.autoScale & -Dsun.java2d.uiScale).",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = true,
                 EclipseIniPath = candidateIni
@@ -231,16 +257,20 @@ public sealed class CompatibilityAnalyzer
 
         if (hasQt6 || hasQt5)
         {
+            string qtVer = hasQt6 ? "Qt 6" : "Qt 5";
             return new CompatibilityReport
             {
                 Technology = hasQt6 ? ScalingTech.Qt6 : ScalingTech.Qt5,
-                TechnologyBadge = hasQt6 ? "Qt 6" : "Qt 5",
+                TechnologyBadge = qtVer,
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.QtEnvironment,
                 DpiAwarenessLabel = "Per-Monitor HiDPI",
-                SummaryTitle = $"{(hasQt6 ? "Qt 6" : "Qt 5")} yerel kesirli HiDPI ölçeklendirmesi destekleniyor",
-                Explanation = "Qt arayüz motoru bağımsız ölçek çarpanını ve kesirli (ör. %115, %125, %150) yuvarlamasız ölçeklendirmeyi doğrudan destekler. Sistem genelindeki diğer Qt uygulamalarını etkilememek için ayar yalnızca bu uygulamanın çalışma ortamına uygulanır.",
-                MechanismDescription = "Süreç bazlı QT_SCALE_FACTOR (Windows ekran ölçeğine göre otomatik oranlanır) ve QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough.",
+                SummaryTitle = $"{qtVer} native fractional HiDPI scaling is supported",
+                SummaryTitleTr = $"{qtVer} yerel kesirli HiDPI ölçeklendirmesi destekleniyor",
+                Explanation = "The Qt UI engine natively supports custom scale factors and unrounded fractional scaling (e.g., 115%, 125%, 150%). The scale factor is scoped strictly to this application's process environment without affecting other Qt apps.",
+                ExplanationTr = "Qt arayüz motoru bağımsız ölçek çarpanını ve kesirli (ör. %115, %125, %150) yuvarlamasız ölçeklendirmeyi doğrudan destekler. Sistem genelindeki diğer Qt uygulamalarını etkilememek için ayar yalnızca bu uygulamanın çalışma ortamına uygulanır.",
+                MechanismDescription = "Per-process QT_SCALE_FACTOR (normalized to OS display scale) with QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough.",
+                MechanismDescriptionTr = "Süreç bazlı QT_SCALE_FACTOR (Windows ekran ölçeğine göre otomatik oranlanır) ve QT_SCALE_FACTOR_ROUNDING_POLICY=PassThrough.",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = false
             };
@@ -256,9 +286,12 @@ public sealed class CompatibilityAnalyzer
                 Support = SupportLevel.Partial,
                 DeliveryMode = ScalingDeliveryMode.GtkEnvironment,
                 DpiAwarenessLabel = "GTK HiDPI",
-                SummaryTitle = "GTK arayüz ve metin ölçeklendirmesi kısmen destekleniyor",
-                Explanation = "GTK araç takımı Windows üzerinde metin ve simge boyutlarını GDK_DPI_SCALE ile kesirli oranlarda ölçekleyebilir; ancak bazı sabit piksel kenar boşlukları yalnızca tam sayı katlarında (%100, %200) tam genişler.",
-                MechanismDescription = "Süreç bazlı GDK_SCALE ve GDK_DPI_SCALE ortam değişkenleri ile DPIShift başlatıcısı üzerinden çalıştırma.",
+                SummaryTitle = "GTK interface and font scaling is partially supported",
+                SummaryTitleTr = "GTK arayüz ve metin ölçeklendirmesi kısmen destekleniyor",
+                Explanation = "GTK on Windows supports fractional font and icon scaling via GDK_DPI_SCALE, while some fixed-pixel widget paddings only expand at integer multiples (100%, 200%).",
+                ExplanationTr = "GTK araç takımı Windows üzerinde metin ve simge boyutlarını GDK_DPI_SCALE ile kesirli oranlarda ölçekleyebilir; ancak bazı sabit piksel kenar boşlukları yalnızca tam sayı katlarında (%100, %200) tam genişler.",
+                MechanismDescription = "Per-process GDK_SCALE and GDK_DPI_SCALE environment variables via the DPIShift launcher.",
+                MechanismDescriptionTr = "Süreç bazlı GDK_SCALE ve GDK_DPI_SCALE ortam değişkenleri ile DPIShift başlatıcısı üzerinden çalıştırma.",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = false
             };
@@ -274,9 +307,12 @@ public sealed class CompatibilityAnalyzer
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.JavaEnvironment,
                 DpiAwarenessLabel = "Java2D HiDPI",
-                SummaryTitle = "Java masaüstü HiDPI arayüz ölçeklendirmesi destekleniyor",
-                Explanation = "Java 9+ Java2D ve JavaFX görüntüleme hattı bağımsız arayüz ölçek çarpanını destekler. Yalnızca hedef Java sürecine özel ölçek parametresi aktarılır.",
-                MechanismDescription = "Süreç bazlı JAVA_TOOL_OPTIONS (-Dsun.java2d.uiScale ve -Dglass.win.uiScale).",
+                SummaryTitle = "Java desktop HiDPI interface scaling is supported",
+                SummaryTitleTr = "Java masaüstü HiDPI arayüz ölçeklendirmesi destekleniyor",
+                Explanation = "The Java 9+ Java2D and JavaFX rendering pipeline supports independent UI scale factors scoped directly to the target Java process.",
+                ExplanationTr = "Java 9+ Java2D ve JavaFX görüntüleme hattı bağımsız arayüz ölçek çarpanını destekler. Yalnızca hedef Java sürecine özel ölçek parametresi aktarılır.",
+                MechanismDescription = "Per-process JAVA_TOOL_OPTIONS (-Dsun.java2d.uiScale and -Dglass.win.uiScale).",
+                MechanismDescriptionTr = "Süreç bazlı JAVA_TOOL_OPTIONS (-Dsun.java2d.uiScale ve -Dglass.win.uiScale).",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = false
             };
@@ -293,9 +329,12 @@ public sealed class CompatibilityAnalyzer
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.WebView2Environment,
                 DpiAwarenessLabel = "Per-Monitor V2",
-                SummaryTitle = "WebView2 tabanlı vektörel arayüz ölçeklendirmesi destekleniyor",
-                Explanation = "Microsoft Edge WebView2 çalışma zamanını kullanan bu uygulamanın tüm web tabanlı arayüzü bağımsız cihaz ölçek çarpanıyla keskin biçimde ölçeklendirilir.",
-                MechanismDescription = "Süreç bazlı WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS (--force-device-scale-factor).",
+                SummaryTitle = "WebView2-based vector interface scaling is supported",
+                SummaryTitleTr = "WebView2 tabanlı vektörel arayüz ölçeklendirmesi destekleniyor",
+                Explanation = "Applications powered by Microsoft Edge WebView2 render their entire web-based interface crisply at the configured device scale factor.",
+                ExplanationTr = "Microsoft Edge WebView2 çalışma zamanını kullanan bu uygulamanın tüm web tabanlı arayüzü bağımsız cihaz ölçek çarpanıyla keskin biçimde ölçeklendirilir.",
+                MechanismDescription = "Per-process WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS (--force-device-scale-factor).",
+                MechanismDescriptionTr = "Süreç bazlı WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS (--force-device-scale-factor).",
                 RequiresRestart = true,
                 SupportsDirectShortcutFlags = false
             };
@@ -303,7 +342,14 @@ public sealed class CompatibilityAnalyzer
 
         // Determine effective DPI awareness from live window (most accurate) or embedded PE manifest
         DpiAwarenessKind awareness = GetEffectiveDpiAwareness(liveWindowHandle, binInfo.ManifestAwareness);
-        string awarenessLabel = awareness switch
+        string awarenessLabelEn = awareness switch
+        {
+            DpiAwarenessKind.PerMonitorV2 => "Per-Monitor V2",
+            DpiAwarenessKind.PerMonitor => "Per-Monitor",
+            DpiAwarenessKind.System => "System DPI",
+            _ => "DPI Unaware / Legacy"
+        };
+        string awarenessLabelTr = awareness switch
         {
             DpiAwarenessKind.PerMonitorV2 => "Per-Monitor V2",
             DpiAwarenessKind.PerMonitor => "Per-Monitor",
@@ -320,10 +366,14 @@ public sealed class CompatibilityAnalyzer
                 TechnologyBadge = ".NET WPF",
                 Support = SupportLevel.Full,
                 DeliveryMode = ScalingDeliveryMode.LiveRuntimeDpiMessage,
-                DpiAwarenessLabel = awareness is DpiAwarenessKind.Unknown ? "WPF Vektörel DIP" : awarenessLabel,
-                SummaryTitle = "Canlı çalışma zamanı vektörel DPI ölçeklendirmesi tam destekleniyor",
-                Explanation = "WPF, cihazdan bağımsız vektörel birimlerle (DIP) çizim yapar. Uygulamayı yeniden başlatmaya gerek kalmadan açık pencereye anında gerçek vektörel DPI ölçeği uygulanabilir ve tek tıkla %100'e geri döndürülebilir.",
-                MechanismDescription = "Canlı Win32 WM_DPICHANGED vektörel DPI sinyali ve pencere açılışında sıfır-CPU olay tabanlı otomatik uygulama.",
+                DpiAwarenessLabel = awareness is DpiAwarenessKind.Unknown ? "WPF Vector DIP" : awarenessLabelEn,
+                DpiAwarenessLabelTr = awareness is DpiAwarenessKind.Unknown ? "WPF Vektörel DIP" : awarenessLabelTr,
+                SummaryTitle = "Live runtime vector DPI scaling is fully supported",
+                SummaryTitleTr = "Canlı çalışma zamanı vektörel DPI ölçeklendirmesi tam destekleniyor",
+                Explanation = "WPF renders using device-independent vector units (DIP). True vector DPI scaling can be applied immediately to open windows without restarting the app, and reverted to 100% in one click.",
+                ExplanationTr = "WPF, cihazdan bağımsız vektörel birimlerle (DIP) çizim yapar. Uygulamayı yeniden başlatmaya gerek kalmadan açık pencereye anında gerçek vektörel DPI ölçeği uygulanabilir ve tek tıkla %100'e geri döndürülebilir.",
+                MechanismDescription = "Live Win32 WM_DPICHANGED vector DPI signal and zero-CPU event-driven auto-apply on window open.",
+                MechanismDescriptionTr = "Canlı Win32 WM_DPICHANGED vektörel DPI sinyali ve pencere açılışında sıfır-CPU olay tabanlı otomatik uygulama.",
                 RequiresRestart = false,
                 SupportsDirectShortcutFlags = false
             };
@@ -340,10 +390,14 @@ public sealed class CompatibilityAnalyzer
                     TechnologyBadge = ".NET WinForms (PMv2)",
                     Support = SupportLevel.Full,
                     DeliveryMode = ScalingDeliveryMode.LiveRuntimeDpiMessage,
-                    DpiAwarenessLabel = awarenessLabel,
-                    SummaryTitle = "Per-Monitor DPI uyumlu WinForms canlı ölçeklendirme destekleniyor",
-                    Explanation = "Bu modern WinForms uygulaması Per-Monitor DPI desteğine sahiptir. Yeniden başlatma gerekmeden pencere kontrolleri ve yazı tipleri canlı olarak hedef DPI oranına ölçeklendirilebilir.",
-                    MechanismDescription = "Canlı Win32 WM_DPICHANGED DPI sinyali ve pencere açılışında otomatik uygulama.",
+                    DpiAwarenessLabel = awarenessLabelEn,
+                    DpiAwarenessLabelTr = awarenessLabelTr,
+                    SummaryTitle = "Per-Monitor DPI-aware WinForms live scaling is supported",
+                    SummaryTitleTr = "Per-Monitor DPI uyumlu WinForms canlı ölçeklendirme destekleniyor",
+                    Explanation = "This modern WinForms application declares Per-Monitor DPI support. Window controls and fonts can be scaled live to the target DPI ratio without restarting.",
+                    ExplanationTr = "Bu modern WinForms uygulaması Per-Monitor DPI desteğine sahiptir. Yeniden başlatma gerekmeden pencere kontrolleri ve yazı tipleri canlı olarak hedef DPI oranına ölçeklendirilebilir.",
+                    MechanismDescription = "Live Win32 WM_DPICHANGED DPI signal and automatic application on window open.",
+                    MechanismDescriptionTr = "Canlı Win32 WM_DPICHANGED DPI sinyali ve pencere açılışında otomatik uygulama.",
                     RequiresRestart = false
                 };
             }
@@ -351,12 +405,16 @@ public sealed class CompatibilityAnalyzer
             return new CompatibilityReport
             {
                 Technology = ScalingTech.LegacySystemOrUnaware,
-                TechnologyBadge = ".NET WinForms (Klasik)",
+                TechnologyBadge = ".NET WinForms (Legacy)",
+                TechnologyBadgeTr = ".NET WinForms (Klasik)",
                 Support = SupportLevel.Unsupported,
                 DeliveryMode = ScalingDeliveryMode.None,
-                DpiAwarenessLabel = awarenessLabel,
-                SummaryTitle = "Bağımsız vektörel DPI ölçeklendirmesi desteklenmiyor",
-                Explanation = "Bu klasik WinForms uygulaması Per-Monitor V2 DPI bildirimi içermiyor ve yalnızca Windows açılışındaki genel sistem DPI değerine kilitleniyor. Bulanık bitmap büyütme kullanmadan sistem ölçeğinden bağımsız keskin arayüz ölçeklendirmesi teknik olarak mümkün değildir."
+                DpiAwarenessLabel = awarenessLabelEn,
+                DpiAwarenessLabelTr = awarenessLabelTr,
+                SummaryTitle = "Independent vector DPI scaling is not supported",
+                SummaryTitleTr = "Bağımsız vektörel DPI ölçeklendirmesi desteklenmiyor",
+                Explanation = "This legacy WinForms application lacks Per-Monitor V2 DPI awareness and locks to the global system DPI at login. Sharp per-app UI scaling independent of the OS scale is not technically possible without blurry bitmap stretching.",
+                ExplanationTr = "Bu klasik WinForms uygulaması Per-Monitor V2 DPI bildirimi içermiyor ve yalnızca Windows açılışındaki genel sistem DPI değerine kilitleniyor. Bulanık bitmap büyütme kullanmadan sistem ölçeğinden bağımsız keskin arayüz ölçeklendirmesi teknik olarak mümkün değildir."
             };
         }
 
@@ -366,13 +424,18 @@ public sealed class CompatibilityAnalyzer
             return new CompatibilityReport
             {
                 Technology = ScalingTech.Win32PerMonitor,
-                TechnologyBadge = binInfo.IsWinUi ? "WinUI 3" : "Yerel Win32 (Per-Monitor)",
+                TechnologyBadge = binInfo.IsWinUi ? "WinUI 3" : "Native Win32 (Per-Monitor)",
+                TechnologyBadgeTr = binInfo.IsWinUi ? "WinUI 3" : "Yerel Win32 (Per-Monitor)",
                 Support = SupportLevel.Partial,
                 DeliveryMode = ScalingDeliveryMode.LiveRuntimeDpiMessage,
-                DpiAwarenessLabel = awarenessLabel,
-                SummaryTitle = "Yerel Per-Monitor DPI sinyali kısmen destekleniyor",
-                Explanation = "Uygulama Per-Monitor DPI farkındalığına sahip. DPIShift pencereye canlı WM_DPICHANGED DPI sinyali gönderebilir; WM_DPICHANGED parametresini kullanan bileşenler keskin biçimde ölçeklenir, ancak donanım monitör DPI'ını (GetDpiForWindow) her çizimde yeniden sorgulayan yerel kontroller varsayılan boyutta kalabilir.",
-                MechanismDescription = "Canlı Win32 WM_DPICHANGED DPI sinyali (DLL enjeksiyonu olmadan güvenli mod).",
+                DpiAwarenessLabel = awarenessLabelEn,
+                DpiAwarenessLabelTr = awarenessLabelTr,
+                SummaryTitle = "Native Per-Monitor DPI signaling is partially supported",
+                SummaryTitleTr = "Yerel Per-Monitor DPI sinyali kısmen destekleniyor",
+                Explanation = "The application is Per-Monitor DPI aware. DPIShift can send live WM_DPICHANGED DPI signals to the window; components that follow WM_DPICHANGED scale sharply, while native controls that re-query hardware monitor DPI (GetDpiForWindow) on each paint may remain at default size.",
+                ExplanationTr = "Uygulama Per-Monitor DPI farkındalığına sahip. DPIShift pencereye canlı WM_DPICHANGED DPI sinyali gönderebilir; WM_DPICHANGED parametresini kullanan bileşenler keskin biçimde ölçeklenir, ancak donanım monitör DPI'ını (GetDpiForWindow) her çizimde yeniden sorgulayan yerel kontroller varsayılan boyutta kalabilir.",
+                MechanismDescription = "Live Win32 WM_DPICHANGED DPI signal (safe mode without DLL injection).",
+                MechanismDescriptionTr = "Canlı Win32 WM_DPICHANGED DPI sinyali (DLL enjeksiyonu olmadan güvenli mod).",
                 RequiresRestart = false
             };
         }
@@ -381,12 +444,16 @@ public sealed class CompatibilityAnalyzer
         return new CompatibilityReport
         {
             Technology = ScalingTech.LegacySystemOrUnaware,
-            TechnologyBadge = "Klasik Win32 / GDI",
+            TechnologyBadge = "Legacy Win32 / GDI",
+            TechnologyBadgeTr = "Klasik Win32 / GDI",
             Support = SupportLevel.Unsupported,
             DeliveryMode = ScalingDeliveryMode.None,
-            DpiAwarenessLabel = awarenessLabel,
-            SummaryTitle = "Gerçek bağımsız DPI ölçeklendirmesi desteklenmiyor",
-            Explanation = "Bu uygulama sabit piksel veya yalnızca genel Windows Sistem DPI modunu kullanıyor. Windows genel ölçeği değiştirilmeden bu uygulamayı büyütmek yalnızca görüntüyü bulanıklaştıran bitmap esnetme ile yapılabilir; DPIShift bulanık ölçeklendirme uygulamak yerine uygulamayı korur."
+            DpiAwarenessLabel = awarenessLabelEn,
+            DpiAwarenessLabelTr = awarenessLabelTr,
+            SummaryTitle = "True independent DPI scaling is not supported",
+            SummaryTitleTr = "Gerçek bağımsız DPI ölçeklendirmesi desteklenmiyor",
+            Explanation = "This application uses fixed-pixel GDI rendering or locks to the global Windows System DPI. Scaling it without changing global Windows scaling would only produce blurry bitmap stretching, so DPIShift leaves the application untouched.",
+            ExplanationTr = "Bu uygulama sabit piksel veya yalnızca genel Windows Sistem DPI modunu kullanıyor. Windows genel ölçeği değiştirilmeden bu uygulamayı büyütmek yalnızca görüntüyü bulanıklaştıran bitmap esnetme ile yapılabilir; DPIShift bulanık ölçeklendirme uygulamak yerine uygulamayı korur."
         };
     }
 
@@ -494,9 +561,12 @@ public sealed class CompatibilityAnalyzer
             Support = SupportLevel.Full,
             DeliveryMode = ScalingDeliveryMode.ChromiumFlags,
             DpiAwarenessLabel = "Per-Monitor V2",
-            SummaryTitle = "Gerçek vektörel arayüz ölçeklendirmesi tam destekleniyor",
-            Explanation = $"{Path.GetFileNameWithoutExtension(innerProcessName)} Electron (Chromium) arayüz motorunu ve Squirrel güncelleyicisini kullanıyor. Sunucu/kanal listesi, sohbet alanı, menüler ve tüm arayüz bileşenleri otomatik güncellemelerden etkilenmeden hedef yüzdede keskin biçimde ölçeklendirilir.",
-            MechanismDescription = $"Squirrel başlatıcı köprüsü (Update.exe --processStart {innerProcessName} --process-start-args \"--force-device-scale-factor=...\") ve kısayol/başlangıç entegrasyonu.",
+            SummaryTitle = "Full vector interface scaling is supported",
+            SummaryTitleTr = "Gerçek vektörel arayüz ölçeklendirmesi tam destekleniyor",
+            Explanation = $"{Path.GetFileNameWithoutExtension(innerProcessName)} uses the Electron (Chromium) rendering engine and Squirrel updater. Server/channel lists, chat panels, menus, and all UI elements scale crisply at the target percentage and persist across automatic updates.",
+            ExplanationTr = $"{Path.GetFileNameWithoutExtension(innerProcessName)} Electron (Chromium) arayüz motorunu ve Squirrel güncelleyicisini kullanıyor. Sunucu/kanal listesi, sohbet alanı, menüler ve tüm arayüz bileşenleri otomatik güncellemelerden etkilenmeden hedef yüzdede keskin biçimde ölçeklendirilir.",
+            MechanismDescription = $"Squirrel launcher bridge (Update.exe --processStart {innerProcessName} --process-start-args \"--force-device-scale-factor=...\") and shortcut/startup integration.",
+            MechanismDescriptionTr = $"Squirrel başlatıcı köprüsü (Update.exe --processStart {innerProcessName} --process-start-args \"--force-device-scale-factor=...\") ve kısayol/başlangıç entegrasyonu.",
             RequiresRestart = true,
             SupportsDirectShortcutFlags = true,
             SquirrelRootDir = rootDir,
@@ -517,12 +587,15 @@ public sealed class CompatibilityAnalyzer
             return new CompatibilityReport
             {
                 Technology = ScalingTech.GameOrAntiCheat,
-                TechnologyBadge = "Oyun / 3D Grafik Motoru",
+                TechnologyBadge = "Game / 3D Engine",
+                TechnologyBadgeTr = "Oyun / 3D Grafik Motoru",
                 Support = SupportLevel.Unsupported,
                 DeliveryMode = ScalingDeliveryMode.None,
                 DpiAwarenessLabel = "DirectX / Vulkan",
-                SummaryTitle = "Oyun ve tam ekran 3D grafik motoru (Korumalı)",
-                Explanation = "3D oyunlar kendi iç çözünürlük ve HUD ölçeklendirme sistemlerini kullanır. Oyun performansını etkilememek ve hile koruma (Anti-Cheat) sistemleriyle tam uyumluluğu korumak için DPIShift oyun süreçlerine kesinlikle dokunmaz."
+                SummaryTitle = "3D game & graphics engine (Protected)",
+                SummaryTitleTr = "Oyun ve tam ekran 3D grafik motoru (Korumalı)",
+                Explanation = "3D games manage their own internal rendering resolution and HUD scaling. To preserve gaming performance and guarantee 100% compatibility with Anti-Cheat systems, DPIShift never modifies game processes.",
+                ExplanationTr = "3D oyunlar kendi iç çözünürlük ve HUD ölçeklendirme sistemlerini kullanır. Oyun performansını etkilememek ve hile koruma (Anti-Cheat) sistemleriyle tam uyumluluğu korumak için DPIShift oyun süreçlerine kesinlikle dokunmaz."
             };
         }
 
@@ -606,9 +679,14 @@ public sealed class CompatibilityAnalyzer
             Support = SupportLevel.Full,
             DeliveryMode = ScalingDeliveryMode.JetBrainsVmOptions,
             DpiAwarenessLabel = "JBR Per-Monitor HiDPI",
-            SummaryTitle = $"{productName} için gerçek vektörel HiDPI ölçeklendirmesi tam destekleniyor",
-            Explanation = "JetBrains Runtime (JBR), tüm SVG simgeleri, proje ağacı, veri tabloları, araç çubukları, menüler ve kod düzenleyiciyi bağımsız HiDPI ölçeğinde vektörel olarak çizer. Ayar kullanıcı profilindeki .vmoptions dosyasına kaydedildiği için Başlat Menüsü, Görev Çubuğu veya JetBrains Toolbox'tan açıldığında da otomatik çalışır.",
+            SummaryTitle = $"Full vector HiDPI scaling is supported for {productName}",
+            SummaryTitleTr = $"{productName} için gerçek vektörel HiDPI ölçeklendirmesi tam destekleniyor",
+            Explanation = "JetBrains Runtime (JBR) renders all SVG icons, project trees, data grids, toolbars, menus, and code editors as crisp vectors at your custom HiDPI scale. Because the setting is saved to your user .vmoptions profile, it works automatically when launched from Start Menu, Taskbar, or JetBrains Toolbox.",
+            ExplanationTr = "JetBrains Runtime (JBR), tüm SVG simgeleri, proje ağacı, veri tabloları, araç çubukları, menüler ve kod düzenleyiciyi bağımsız HiDPI ölçeğinde vektörel olarak çizer. Ayar kullanıcı profilindeki .vmoptions dosyasına kaydedildiği için Başlat Menüsü, Görev Çubuğu veya JetBrains Toolbox'tan açıldığında da otomatik çalışır.",
             MechanismDescription = vmOptionsPath is not null
+                ? $"User VM options ({Path.GetFileName(vmOptionsPath)}: -Dsun.java2d.uiScale) and process launcher support."
+                : "JetBrains Runtime VM scale factor (-Dsun.java2d.uiScale).",
+            MechanismDescriptionTr = vmOptionsPath is not null
                 ? $"Kullanıcı VM seçenekleri ({Path.GetFileName(vmOptionsPath)}: -Dsun.java2d.uiScale) ve süreç başlatıcı desteği."
                 : "JetBrains Runtime VM ölçek parametresi (-Dsun.java2d.uiScale).",
             RequiresRestart = true,

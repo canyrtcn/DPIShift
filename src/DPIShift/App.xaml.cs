@@ -2,6 +2,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Windows;
 using DPIShift.Core.Detection;
+using DPIShift.Core.Localization;
 using DPIShift.Core.Native;
 using DPIShift.Core.Persistence;
 using DPIShift.Core.Scaling;
@@ -45,7 +46,9 @@ public partial class App : Application
         {
             args.Handled = true;
             MessageBox.Show(
-                $"Beklenmeyen bir hata oluştu:\n{args.Exception.Message}",
+                Loc.Pick(
+                    $"An unexpected error occurred:\n{args.Exception.Message}",
+                    $"Beklenmeyen bir hata oluştu:\n{args.Exception.Message}"),
                 "DPIShift",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -115,8 +118,10 @@ public partial class App : Application
             _orchestrator.Settings.ShowTrayNotificationOnFirstClose = false;
             _orchestrator.SaveSettings(_orchestrator.Settings);
             _trayService?.ShowBalloonNotification(
-                "DPIShift Arka Planda Hazır",
-                "DPIShift sistem tepsisine küçültüldü. Tekrar açmak için tepsi simgesine tıklayın, çıkmak için sağ tıklayın.");
+                Loc.Pick("DPIShift Running in Background", "DPIShift Arka Planda Hazır"),
+                Loc.Pick(
+                    "DPIShift minimized to the system tray. Click the tray icon to reopen, or right-click to exit.",
+                    "DPIShift sistem tepsisine küçültüldü. Tekrar açmak için tepsi simgesine tıklayın, çıkmak için sağ tıklayın."));
         }
 
         // Release transient caches and trim OS working set while idle in tray
@@ -168,8 +173,12 @@ public partial class App : Application
 
         int activeCount = _orchestrator.Profiles.Count(p => p.IsEnabled && p.ScalePercent != 100);
         string tip = activeCount > 0
-            ? $"DPIShift — {activeCount} aktif uygulama ölçeği"
-            : "DPIShift — Uygulama Bazlı Ekran Ölçeklendirme";
+            ? Loc.Pick(
+                $"DPIShift — {activeCount} active scaling rule(s)",
+                $"DPIShift — {activeCount} aktif uygulama ölçeği")
+            : Loc.Pick(
+                "DPIShift — Per-Application Display Scaling",
+                "DPIShift — Uygulama Bazlı Ekran Ölçeklendirme");
         _trayService.UpdateTooltip(tip);
     }
 

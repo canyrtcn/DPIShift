@@ -1,4 +1,5 @@
 using System.Windows.Media;
+using DPIShift.Core.Localization;
 using DPIShift.Core.Models;
 using DPIShift.Core.Native;
 
@@ -61,7 +62,9 @@ public sealed class AppItemViewModel : ObservableObject
         }
     }
 
-    public string RunningStateText => IsRunning ? "Çalışıyor" : "Kapalı";
+    public string RunningStateText => IsRunning
+        ? Loc.Pick("Running", "Çalışıyor")
+        : Loc.Pick("Stopped", "Kapalı");
 
     public int? ConfiguredScalePercent
     {
@@ -78,7 +81,9 @@ public sealed class AppItemViewModel : ObservableObject
 
     public bool HasCustomScale => _configuredScalePercent is not null && _configuredScalePercent != 100;
 
-    public string ConfiguredScaleBadge => HasCustomScale ? $"%{_configuredScalePercent}" : string.Empty;
+    public string ConfiguredScaleBadge => HasCustomScale
+        ? (Loc.IsTurkish ? $"%{_configuredScalePercent}" : $"{_configuredScalePercent}%")
+        : string.Empty;
 
     public void SyncFromModelAndProfile(AppScaleProfile? profile)
     {
@@ -86,6 +91,13 @@ public sealed class AppItemViewModel : ObservableObject
         ConfiguredScalePercent = profile is { IsEnabled: true } && profile.ScalePercent != 100
             ? profile.ScalePercent
             : null;
+        NotifyLocalizationChanged();
+    }
+
+    public void NotifyLocalizationChanged()
+    {
+        OnPropertyChanged(nameof(RunningStateText));
+        OnPropertyChanged(nameof(ConfiguredScaleBadge));
         OnPropertyChanged(nameof(Compatibility));
         OnPropertyChanged(nameof(Support));
         OnPropertyChanged(nameof(SupportBadgeText));

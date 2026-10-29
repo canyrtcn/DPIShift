@@ -5,91 +5,92 @@
 <h1 align="center">DPIShift</h1>
 
 <p align="center">
-  <strong>Windows için Uygulama Bazlı Arayüz ve DPI Ölçeklendirme Yöneticisi</strong>
+  <strong>Per-Application Display &amp; UI DPI Scaling Manager for Windows</strong>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D4?style=flat-square&logo=windows&logoColor=white" alt="Platform" />
   <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET 8" />
-  <img src="https://img.shields.io/badge/Mimari-x64-2A2A30?style=flat-square" alt="Architecture" />
-  <a href="LICENSE"><img src="https://img.shields.io/badge/Lisans-MIT-E5703E?style=flat-square" alt="License" /></a>
+  <img src="https://img.shields.io/badge/Architecture-x64-2A2A30?style=flat-square" alt="Architecture" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-E5703E?style=flat-square" alt="License" /></a>
 </p>
 
 <p align="center">
-  <img src="assets/screenshot.png" width="960" alt="DPIShift Arayüz Görünümü" />
+  <img src="assets/screenshot.png" width="960" alt="DPIShift Interface" />
 </p>
 
 ---
 
-## Genel Bakış
+## Overview
 
-**DPIShift**, Windows'un sistem genelindeki ekran ölçeklendirmesini (örneğin **%100**) değiştirmeden, seçtiğiniz masaüstü uygulamalarının arayüzlerini bağımsız oranlarda (**%75 – %225**) ölçeklendirmenizi sağlar.
+**DPIShift** lets you configure independent UI/DPI scaling factors (**75% – 225%**) for individual desktop applications while keeping your global Windows display scale untouched (e.g., at **100%**).
 
-Yalnızca pencere boyutunu büyüten, görüntüyü bulanıklaştıran veya tarayıcı içi sayfa yakınlaştırması yapan çözümlerden farklı olarak; uygulamanın kendi görüntüleme motoruna gerçek arayüz/DPI çarpanını iletir. Böylece sekmeler, menüler, kenar çubukları, simgeler ve metinler bulanıklaşmadan vektörel olarak çizilir.
+Unlike tools that merely resize windows, apply blurry bitmap stretching, or rely on in-page browser zoom, DPIShift passes native HiDPI scale factors directly to each application's rendering engine—ensuring tabs, sidebars, menus, icons, and text are rendered as crisp vectors.
 
-| Uygulama Örneği | Ölçek Oranı | Sonuç |
+| Target | Scale | Behavior |
 | :--- | :---: | :--- |
-| **Windows Genel Ölçeği** | `%100` | Sistem genelinde sabit kalır |
-| **Google Chrome / Edge / Brave** | `%125` | Sekmeler, adres çubuğu, menüler ve içerik `%125` HiDPI |
-| **Discord / VS Code / Cursor / Obsidian** | `%110` | Tüm uygulama arayüzü keskin `%110` ölçeğinde |
-| **DataGrip / IntelliJ IDEA / PyCharm** | `%150` | Paneller, tablolar, simgeler ve editör `%150` ölçeğinde |
-| **OBS Studio / VLC / DBeaver** | `%125` | Uygulama arayüzü bağımsız `%125` ölçeğinde |
+| **Windows Global Display Scale** | `100%` | Remains fixed system-wide |
+| **Google Chrome / Edge / Brave** | `125%` | Browser tabs, address bar, menus, and content render at true `125%` HiDPI |
+| **Discord / VS Code / Cursor / Obsidian** | `110%` | Entire application interface renders crisply at `110%` |
+| **DataGrip / IntelliJ IDEA / PyCharm** | `150%` | Toolbars, project trees, tables, icons, and editor render at `150%` |
+| **OBS Studio / VLC / DBeaver** | `125%` | Application UI scales independently at `125%` |
 
 ---
 
-## Temel Özellikler
+## Key Features
 
-- **Otomatik Uyumluluk Tespiti:** Kurulu ve çalışan uygulamaları tarayarak hangi ölçeklendirme teknolojisini desteklediğini otomatik belirler.
-- **Gerçek Vektörel Ölçeklendirme:** Bulanık bitmap büyütme yerine uygulama altyapısına uygun yerel HiDPI ölçeklendirmesi uygular.
-- **Kısayol ve Profil Entegrasyonu:** Masaüstü, Başlat Menüsü ve Görev Çubuğu kısayollarını otomatik yedekleyerek günceller.
-- **Tek Tıkla Geri Alma:** **Varsayılana Döndür (%100)** seçeneğiyle yapılan tüm değişiklikleri yedeklerden geri yükleyerek uygulamayı orijinal haline döndürür.
-- **Sistem Tepsisi (System Tray) Desteği:** Arka planda minimum bellek ve **%0 boşta CPU** kullanımıyla sessizce çalışabilir, Windows açılışında otomatik başlatılabilir.
-- **Oyun ve Güvenlik Dostu:** Sistem dosyalarına müdahale etmez, yönetici (UAC) izni veya DLL enjeksiyonu kullanmaz; oyun performansını ve hile koruma yazılımlarını etkilemez.
+- **Automatic Compatibility Detection:** Scans installed and running applications to identify supported UI frameworks automatically.
+- **True Vector HiDPI Scaling:** Applies framework-native scaling rather than blurry bitmap magnification.
+- **Shortcut & Profile Integration:** Automatically backs up and updates Desktop, Start Menu, and Taskbar shortcuts.
+- **Lossless One-Click Rollback:** Restores modified shortcuts, configuration files, and runtime DPI states back to `100%` default behavior at any time.
+- **Lightweight System Tray Mode:** Runs quietly in the Windows system tray with minimal memory footprint, **0% idle CPU usage**, and optional startup on Windows login.
+- **Game & Anti-Cheat Safe:** Does not use DLL injection, global hooks, or administrator privileges (`UAC`), ensuring zero impact on gaming performance or anti-cheat software.
+- **Bilingual Interface:** Built-in **English** (default) and **Turkish** (`EN / TR`) interface language support.
 
 ---
 
-## Desteklenen Uygulama Türleri
+## Supported Application Frameworks
 
-| Uygulama Altyapısı | Destek Düzeyi | Yeniden Başlatma |
+| Application Framework | Support Level | Restart Required |
 | :--- | :---: | :---: |
-| **Chromium Tarayıcılar** *(Chrome, Edge, Brave, Vivaldi, Opera)* | Tam Destek | Gerekli |
-| **Electron & Squirrel** *(Discord, VS Code, Cursor, Slack, Notion, Obsidian)* | Tam Destek | Gerekli |
-| **CEF & WebView2 / Tauri** *(Spotify vb.)* | Tam Destek | Gerekli |
-| **JetBrains IDE'leri** *(DataGrip, IntelliJ, PyCharm, WebStorm, Rider, Android Studio)* | Tam Destek | Gerekli |
-| **Eclipse / SWT & Java Masaüstü** *(DBeaver, Eclipse, JavaFX, Swing)* | Tam Destek | Gerekli |
-| **Qt 5 & Qt 6** *(OBS Studio, VLC, Wireshark, KeePassXC, Krita, Calibre)* | Tam Destek | Gerekli |
-| **.NET WPF & Modern WinForms (Per-Monitor V2)** | Tam Destek | Gerekmez *(Anında)* |
-| **GTK 3 / GTK 4 & Yerel Win32 (Per-Monitor V2)** | Kısmi Destek | Uygulamaya Göre |
-| **Klasik Win32 / GDI, UWP ve 3D Oyunlar** | Desteklenmiyor | — |
+| **Chromium Browsers** *(Chrome, Edge, Brave, Vivaldi, Opera)* | Full Support | Yes |
+| **Electron & Squirrel** *(Discord, VS Code, Cursor, Slack, Notion, Obsidian)* | Full Support | Yes |
+| **CEF & WebView2 / Tauri** *(Spotify, etc.)* | Full Support | Yes |
+| **JetBrains IDEs** *(DataGrip, IntelliJ, PyCharm, WebStorm, Rider, Android Studio)* | Full Support | Yes |
+| **Eclipse / SWT & Java Desktop** *(DBeaver, Eclipse, JavaFX, Swing)* | Full Support | Yes |
+| **Qt 5 & Qt 6** *(OBS Studio, VLC, Wireshark, KeePassXC, Krita, Calibre)* | Full Support | Yes |
+| **.NET WPF & Modern WinForms (Per-Monitor V2)** | Full Support | No *(Instant)* |
+| **GTK 3 / GTK 4 & Native Win32 (Per-Monitor V2)** | Partial Support | App-Dependent |
+| **Legacy Win32 / GDI, UWP & 3D Games** | Unsupported | — |
 
 ---
 
-## Kurulum ve Kullanım
+## Getting Started
 
-1. **[Releases](../../releases)** sayfasından sisteminize uygun çalıştırılabilir dosyayı indirin:
-   - **`DPIShift.exe`** *(Önerilen — Taşınabilir Tek EXE)*: Ek kurulum veya .NET çalışma zamanı gerektirmez.
-   - **`DPIShift-light.exe`** *(Hafif Tek EXE)*: Bilgisayarında `.NET 8 Desktop Runtime` kurulu olanlar için küçük boyutlu alternatif.
-2. Uygulamayı çalıştırın, sol listeden ölçeklendirmek istediğiniz uygulamayı seçin (veya **.exe Seç** ile ekleyin).
-3. İstediğiniz ölçek oranını belirleyip **Kaydet ve Uygula** (veya uygulama açıksa **Uygula ve Şimdi Yeniden Başlat**) düğmesine tıklayın.
+1. Download the latest executable from the **[Releases](../../releases)** page:
+   - **`DPIShift.exe`** *(Recommended — Self-Contained Single EXE)*: Runs out of the box with zero runtime prerequisites.
+   - **`DPIShift-light.exe`** *(Lightweight Single EXE)*: Compact build for systems that already have the `.NET 8 Desktop Runtime` installed.
+2. Launch `DPIShift.exe`, select an application from the sidebar (or add one via **Select .exe**).
+3. Choose your target scale percentage and click **Save & Apply** (or **Apply & Restart Now** if the application is currently running).
 
-> Kullanıcı ayarları ve geri alma yedekleri `%LOCALAPPDATA%\DPIShift` dizininde saklanır.
+> User profiles and rollback backups are stored locally in `%LOCALAPPDATA%\DPIShift`.
 
 ---
 
-## Kaynak Koddan Derleme
+## Building from Source
 
-### Gereksinimler
-- Windows 10 (1809+) veya Windows 11
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) (veya üzeri)
+### Prerequisites
+- Windows 10 (1809+) or Windows 11
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) (or newer)
 
-### Derleme ve Paketleme
+### Build & Package
 
 ```powershell
-# Testleri çalıştırır ve dist\ klasöründe tek dosya EXE çıktılarını üretir
+# Runs automated tests and produces single-file executables in dist\
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-Yalnızca derlemek veya testleri çalıştırmak için:
+To build or run tests manually:
 
 ```powershell
 dotnet build DPIShift.sln -c Release
@@ -98,6 +99,6 @@ dotnet test DPIShift.sln -c Release
 
 ---
 
-## Lisans
+## License
 
-Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
+Licensed under the [MIT License](LICENSE).

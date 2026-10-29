@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using DPIShift.Core.Detection;
+using DPIShift.Core.Localization;
 using DPIShift.Core.Models;
 using DPIShift.Core.Native;
 using DPIShift.Core.Scaling;
@@ -36,9 +37,11 @@ public sealed class MainViewModel : ObservableObject
     private bool _draftUpdateShortcuts = true;
     private bool _draftAutoApplyOnOpen = true;
 
-    private string _statusMessage = "Windows genel ölçeklendirmesi korunarak uygulama bazlı DPI yönetimi hazır.";
+    private string _statusMessage = string.Empty;
     private bool _isStatusWarning;
     private int _systemScalePercent = 100;
+
+    public Loc Loc => Loc.Instance;
 
     public ObservableCollection<AppItemViewModel> FilteredApps { get; } = [];
 
@@ -55,6 +58,8 @@ public sealed class MainViewModel : ObservableObject
     public RelayCommand BrowseExecutableCommand { get; }
     public AsyncRelayCommand RefreshAppsCommand { get; }
     public RelayCommand ToggleSettingsCommand { get; }
+    public RelayCommand ToggleLanguageCommand { get; }
+    public RelayCommand<string> SetLanguageCommand { get; }
     public RelayCommand ResetAllRulesCommand { get; }
 
     public event Action? ProfilesChanged;
@@ -69,6 +74,7 @@ public sealed class MainViewModel : ObservableObject
         _orchestrator = orchestrator;
 
         _systemScalePercent = Win32Interop.GetPrimaryMonitorScalePercent();
+        _statusMessage = GetDefaultReadyStatusMessage();
 
         SetFilterTabCommand = new RelayCommand<string>(OnSetFilterTab);
         SelectPresetScaleCommand = new RelayCommand<int>(OnSelectPresetScale, _ => SelectedApp?.CanScale == true);
@@ -81,7 +87,31 @@ public sealed class MainViewModel : ObservableObject
         BrowseExecutableCommand = new RelayCommand(OnBrowseExecutable);
         RefreshAppsCommand = new AsyncRelayCommand(LoadApplicationsAsync);
         ToggleSettingsCommand = new RelayCommand(() => IsSettingsOpen = !IsSettingsOpen);
+        ToggleLanguageCommand = new RelayCommand(() => ApplyLanguage(Loc.IsTurkish ? "en" : "tr"));
+        SetLanguageCommand = new RelayCommand<string>(lang => ApplyLanguage(lang ?? "en"));
         ResetAllRulesCommand = new RelayCommand(OnResetAllRules);
+    }
+
+    private static string GetDefaultReadyStatusMessage() => Loc.Pick(
+        "Per-application DPI scaling ready while preserving Windows global display scaling.",
+        "Windows genel ölçeklendirmesi korunarak uygulama bazlı DPI yönetimi hazır.");
+
+    private void ApplyLanguage(string lang)
+    {
+        Loc.Instance.SetLanguage(lang);
+        _orchestrator.Settings.Language = Loc.Instance.CurrentLanguage;
+        _orchestrator.SaveSettings(_orchestrator.Settings);
+
+        foreach (AppItemViewModel item in _allApps)
+            item.NotifyLocalizationChanged();
+
+        OnPropertyChanged(nameof(SystemScaleBadgeText));
+        OnPropertyChanged(nameof(ActiveRulesBadgeText));
+        OnPropertyChanged(nameof(ScaleComparisonText));
+        OnPropertyChanged(nameof(PrimaryApplyButtonText));
+        OnPropertyChanged(nameof(SelectedApp));
+        SetStatus(GetDefaultReadyStatusMessage(), warning: false);
+        ProfilesChanged?.Invoke();
     }
 
     public int SystemScalePercent
@@ -94,10 +124,14 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    public string SystemScaleBadgeText => $"Windows Ölçeği: %{SystemScalePercent} (Sabit)";
+    public string SystemScaleBadgeText => Loc.IsTurkish
+        ? $"Windows Ölçeği: %{SystemScalePercent} (Sabit)"
+        : $"Windows Scale: {SystemScalePercent}% (Fixed)";
 
     public int ActiveRulesCount => _orchestrator.Profiles.Count(p => p.IsEnabled && p.ScalePercent != 100);
-    public string ActiveRulesBadgeText => $"Aktif Kural: {ActiveRulesCount}";
+    public string ActiveRulesBadgeText => Loc.IsTurkish
+        ? $"Aktif Kural: {ActiveRulesCount}"
+        : $"Active Rules: {ActiveRulesCount}";
 
     public int TotalAppsCount => _allApps.Count;
     public int RunningAppsCount => _allApps.Count(a => a.IsRunning);
@@ -199,8 +233,9 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    public string ScaleComparisonText =>
-        $"Windows: %{SystemScalePercent}  →  {SelectedApp?.DisplayName ?? "Uygulama"}: %{DraftScalePercent}";
+    public string ScaleComparisonText => Loc.IsTurkish
+        ? $"Windows: %{SystemScalePercent}  →  {SelectedApp?.DisplayName ?? "Uygulama"}: %{DraftScalePercent}"
+        : $"Windows: {SystemScalePercent}%  →  {SelectedApp?.DisplayName ?? "Application"}: {DraftScalePercent}%";
 
     public double PreviewBarWidth => Math.Clamp(DraftScalePercent * 1.15, 55, 290);
 
@@ -227,8 +262,8 @@ public sealed class MainViewModel : ObservableObject
 
     public string PrimaryApplyButtonText =>
         SelectedApp?.Compatibility.DeliveryMode == ScalingDeliveryMode.LiveRuntimeDpiMessage && SelectedApp.IsRunning
-            ? "Canlı Uygula (Anında)"
-            : "Kaydet ve Uygula";
+            ? Loc.Pick("Apply Live (Instant)", "Canlı Uygula (Anında)")
+            : Loc.Pick("Save & Apply", "Kaydet ve Uygula");
 
     public string StatusMessage
     {
@@ -282,8 +317,12 @@ public sealed class MainViewModel : ObservableObject
                 _orchestrator.SaveSettings(_orchestrator.Settings);
                 OnPropertyChanged();
                 SetStatus(value
-                    ? "DPIShift, Windows açılışında sistem tepsisinde otomatik başlayacak."
-                    : "Windows açılışında otomatik başlatma kapatıldı.", warning: false);
+                    ? Loc.Pick(
+                        "DPIShift will launch automatically in the system tray on Windows startup.",
+                        "DPIShift, Windows açılışında sistem tepsisinde otomatik başlayacak.")
+                    : Loc.Pick(
+                        "Automatic startup on Windows login disabled.",
+                        "Windows açılışında otomatik başlatma kapatıldı."), warning: false);
             }
         }
     }
@@ -299,8 +338,12 @@ public sealed class MainViewModel : ObservableObject
                 _orchestrator.SaveSettings(_orchestrator.Settings);
                 OnPropertyChanged();
                 SetStatus(value
-                    ? "Arka plan canlı pencere DPI izleyicisi etkinleştirildi (0% boşta CPU)."
-                    : "Arka plan canlı pencere DPI izleyicisi duraklatıldı.", warning: false);
+                    ? Loc.Pick(
+                        "Background live window DPI watcher enabled (0% idle CPU).",
+                        "Arka plan canlı pencere DPI izleyicisi etkinleştirildi (0% boşta CPU).")
+                    : Loc.Pick(
+                        "Background live window DPI watcher paused.",
+                        "Arka plan canlı pencere DPI izleyicisi duraklatıldı."), warning: false);
                 ProfilesChanged?.Invoke();
             }
         }
@@ -420,8 +463,10 @@ public sealed class MainViewModel : ObservableObject
         AppItemViewModel targetVm = SelectedApp;
 
         MessageBoxResult confirm = MessageBox.Show(
-            $"{targetVm.DisplayName} şu anda çalışıyor.\n\n%{DraftScalePercent} arayüz ölçeğinin etkinleşmesi için uygulamanın tüm açık pencereleri ve arka plan süreçleri kapatılıp yeniden başlatılacak. Kaydedilmemiş çalışmalarınızı kaydettiğinizden emin olun.\n\nŞimdi yeniden başlatılsın mı?",
-            "DPIShift — Yeniden Başlat ve Ölçeklendir",
+            Loc.Pick(
+                $"{targetVm.DisplayName} is currently running.\n\nTo activate the {DraftScalePercent}% interface scale, all open windows and background processes of the application will be closed and restarted. Please make sure your unsaved work is saved.\n\nRestart now?",
+                $"{targetVm.DisplayName} şu anda çalışıyor.\n\n%{DraftScalePercent} arayüz ölçeğinin etkinleşmesi için uygulamanın tüm açık pencereleri ve arka plan süreçleri kapatılıp yeniden başlatılacak. Kaydedilmemiş çalışmalarınızı kaydettiğinizden emin olun.\n\nŞimdi yeniden başlatılsın mı?"),
+            Loc.Pick("DPIShift — Restart & Apply Scale", "DPIShift — Yeniden Başlat ve Ölçeklendir"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Question);
 
@@ -443,24 +488,38 @@ public sealed class MainViewModel : ObservableObject
         {
             // User picked 100% -> restart at default 100%
             var tempDefault = CreateAdHocProfile(targetVm, 100);
-            SetStatus($"{targetVm.DisplayName} varsayılan (%100) ölçekle yeniden başlatılıyor...", warning: false);
+            SetStatus(
+                Loc.Pick(
+                    $"Restarting {targetVm.DisplayName} at default (100%) scale...",
+                    $"{targetVm.DisplayName} varsayılan (%100) ölçekle yeniden başlatılıyor..."),
+                warning: false);
             bool okDefault = await ScaledProcessLauncher.RestartAtDefaultScaleAsync(tempDefault);
             await Task.Delay(500);
             RefreshLiveRunningStatus();
             SetStatus(okDefault
-                ? $"{targetVm.DisplayName} varsayılan (%100) ölçekte yeniden başlatıldı."
+                ? Loc.Pick(
+                    $"{targetVm.DisplayName} restarted at default (100%) scale.",
+                    $"{targetVm.DisplayName} varsayılan (%100) ölçekte yeniden başlatıldı.")
                 : applyRes.Message, warning: !okDefault);
             return;
         }
 
-        SetStatus($"{targetVm.DisplayName} kapatılıyor ve %{profile.ScalePercent} ölçeğiyle yeniden başlatılıyor...", warning: false);
+        SetStatus(
+            Loc.Pick(
+                $"Closing {targetVm.DisplayName} and restarting at {profile.ScalePercent}% scale...",
+                $"{targetVm.DisplayName} kapatılıyor ve %{profile.ScalePercent} ölçeğiyle yeniden başlatılıyor..."),
+            warning: false);
         bool launched = await ScaledProcessLauncher.RestartAndLaunchScaledAsync(profile);
         await Task.Delay(600);
         RefreshLiveRunningStatus();
 
         SetStatus(launched
-            ? $"{targetVm.DisplayName} %{profile.ScalePercent} gerçek arayüz ölçeğiyle yeniden başlatıldı."
-            : $"{targetVm.DisplayName} kapatıldı ancak otomatik başlatılamadı. 'Ölçekli Başlat' ile çalıştırabilirsiniz.",
+            ? Loc.Pick(
+                $"{targetVm.DisplayName} restarted at {profile.ScalePercent}% true vector UI scale.",
+                $"{targetVm.DisplayName} %{profile.ScalePercent} gerçek arayüz ölçeğiyle yeniden başlatıldı.")
+            : Loc.Pick(
+                $"{targetVm.DisplayName} was closed, but could not be started automatically. Click 'Launch Scaled' to start it.",
+                $"{targetVm.DisplayName} kapatıldı ancak otomatik başlatılamadı. 'Ölçekli Başlat' ile çalıştırabilirsiniz."),
             warning: !launched);
     }
 
@@ -494,8 +553,12 @@ public sealed class MainViewModel : ObservableObject
 
         bool ok = ScaledProcessLauncher.LaunchScaled(profile);
         SetStatus(ok
-            ? $"{SelectedApp.DisplayName} %{profile.ScalePercent} ölçeğiyle başlatıldı."
-            : $"{SelectedApp.DisplayName} başlatılamadı. Dosya yolunu kontrol edin.",
+            ? Loc.Pick(
+                $"Launched {SelectedApp.DisplayName} at {profile.ScalePercent}% scale.",
+                $"{SelectedApp.DisplayName} %{profile.ScalePercent} ölçeğiyle başlatıldı.")
+            : Loc.Pick(
+                $"Could not launch {SelectedApp.DisplayName}. Please check the executable path.",
+                $"{SelectedApp.DisplayName} başlatılamadı. Dosya yolunu kontrol edin."),
             warning: !ok);
     }
 
@@ -522,8 +585,10 @@ public sealed class MainViewModel : ObservableObject
         if (wasRunning && requiresRestart)
         {
             MessageBoxResult ask = MessageBox.Show(
-                $"{targetVm.DisplayName} için tüm ölçek ayarları ve kısayollar varsayılana döndürüldü.\n\nAçık olan uygulamanın hemen %100 varsayılan ölçeğe dönmesi için şimdi yeniden başlatmak ister misiniz?",
-                "DPIShift — Varsayılan Ölçekle Yeniden Başlat",
+                Loc.Pick(
+                    $"All scaling rules and shortcuts for {targetVm.DisplayName} have been restored to default.\n\nWould you like to restart the running application now so it returns to 100% default scale immediately?",
+                    $"{targetVm.DisplayName} için tüm ölçek ayarları ve kısayollar varsayılana döndürüldü.\n\nAçık olan uygulamanın hemen %100 varsayılan ölçeğe dönmesi için şimdi yeniden başlatmak ister misiniz?"),
+                Loc.Pick("DPIShift — Restart at Default Scale", "DPIShift — Varsayılan Ölçekle Yeniden Başlat"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
 
@@ -533,7 +598,13 @@ public sealed class MainViewModel : ObservableObject
                 await Task.Delay(500);
                 RefreshLiveRunningStatus();
                 if (ok)
-                    SetStatus($"{targetVm.DisplayName} varsayılan (%100) ölçekle yeniden başlatıldı.", warning: false);
+                {
+                    SetStatus(
+                        Loc.Pick(
+                            $"{targetVm.DisplayName} restarted at default (100%) scale.",
+                            $"{targetVm.DisplayName} varsayılan (%100) ölçekle yeniden başlatıldı."),
+                        warning: false);
+                }
             }
         }
     }
@@ -557,8 +628,12 @@ public sealed class MainViewModel : ObservableObject
 
         string? lnk = _orchestrator.CreateDesktopLauncherForProfile(SelectedApp.Id);
         SetStatus(!string.IsNullOrEmpty(lnk)
-            ? $"Masaüstüne ölçekli kısayol oluşturuldu: {Path.GetFileName(lnk)}"
-            : "Masaüstü kısayolu oluşturulamadı.",
+            ? Loc.Pick(
+                $"Created scaled desktop shortcut: {Path.GetFileName(lnk)}",
+                $"Masaüstüne ölçekli kısayol oluşturuldu: {Path.GetFileName(lnk)}")
+            : Loc.Pick(
+                "Could not create desktop shortcut.",
+                "Masaüstü kısayolu oluşturulamadı."),
             warning: string.IsNullOrEmpty(lnk));
     }
 
@@ -583,8 +658,8 @@ public sealed class MainViewModel : ObservableObject
     {
         var dlg = new OpenFileDialog
         {
-            Title = "Ölçeklendirilecek Uygulamayı Seçin (.exe)",
-            Filter = "Uygulamalar (*.exe)|*.exe",
+            Title = Loc.Pick("Select Application to Scale (.exe)", "Ölçeklendirilecek Uygulamayı Seçin (.exe)"),
+            Filter = Loc.Pick("Executables (*.exe)|*.exe", "Uygulamalar (*.exe)|*.exe"),
             CheckFileExists = true
         };
 
@@ -640,7 +715,10 @@ public sealed class MainViewModel : ObservableObject
         RefreshCounters();
         SelectedApp = existing;
 
-        SetStatus($"{existing.DisplayName} analiz edildi: {report.TechnologyBadge} ({report.SupportBadgeText}).",
+        SetStatus(
+            Loc.Pick(
+                $"Analyzed {existing.DisplayName}: {report.TechnologyBadge} ({report.SupportBadgeText}).",
+                $"{existing.DisplayName} analiz edildi: {report.TechnologyBadge} ({report.SupportBadgeText})."),
             warning: !report.CanScale);
     }
 
@@ -648,13 +726,17 @@ public sealed class MainViewModel : ObservableObject
     {
         if (_orchestrator.Profiles.Count == 0)
         {
-            SetStatus("Sıfırlanacak aktif uygulama kuralı bulunmuyor.", warning: false);
+            SetStatus(
+                Loc.Pick("No active application scaling rules to reset.", "Sıfırlanacak aktif uygulama kuralı bulunmuyor."),
+                warning: false);
             return;
         }
 
         MessageBoxResult confirm = MessageBox.Show(
-            "Kaydedilmiş tüm uygulama ölçeklendirme kuralları kaldırılacak; güncellenmiş kısayollar, .vmoptions ayarları ve canlı pencere DPI değerleri orijinal varsayılanlarına döndürülecek.\n\nDevam edilsin mi?",
-            "DPIShift — Tüm Kuralları Sıfırla",
+            Loc.Pick(
+                "All saved application scaling rules will be removed, and modified shortcuts, .vmoptions files, and live window DPI values will be restored to their original defaults.\n\nContinue?",
+                "Kaydedilmiş tüm uygulama ölçeklendirme kuralları kaldırılacak; güncellenmiş kısayollar, .vmoptions ayarları ve canlı pencere DPI değerleri orijinal varsayılanlarına döndürülecek.\n\nDevam edilsin mi?"),
+            Loc.Pick("DPIShift — Reset All Rules", "DPIShift — Tüm Kuralları Sıfırla"),
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
 
@@ -673,7 +755,11 @@ public sealed class MainViewModel : ObservableObject
         RaiseSelectionProperties();
         ProfilesChanged?.Invoke();
 
-        SetStatus($"{count} uygulama kuralı tamamen sıfırlandı ve varsayılan davranışına döndürüldü.", warning: false);
+        SetStatus(
+            Loc.Pick(
+                $"Reset {count} application rule(s) and restored default behavior.",
+                $"{count} uygulama kuralı tamamen sıfırlandı ve varsayılan davranışına döndürüldü."),
+            warning: false);
     }
 
     private void LoadDraftFromSelectedApp()

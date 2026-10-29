@@ -56,7 +56,8 @@
 
             <!-- Quick Launch Scaled Profiles Section -->
             <StackPanel x:Name="QuickLaunchSection" Visibility="Collapsed">
-                <TextBlock Text="ÖLÇEKLİ HIZLI BAŞLAT"
+                <TextBlock x:Name="QuickLaunchHeaderText"
+                           Text="QUICK LAUNCH SCALED"
                            Foreground="#6B6B75"
                            FontSize="10"
                            FontWeight="Bold"
@@ -98,20 +99,22 @@
             </StackPanel>
 
             <!-- Menu Actions -->
-            <Button Content="DPIShift Arayüzünü Aç"
+            <Button x:Name="OpenMainButton"
+                    Content="Open DPIShift"
                     Click="OpenMainWindow_Click"
                     Style="{StaticResource PrimaryButtonStyle}"
                     Padding="10,7"
                     Margin="0,0,0,6" />
 
             <Button x:Name="ToggleWatcherButton"
-                    Content="Canlı İzleyiciyi Duraklat"
+                    Content="Pause Live Watcher"
                     Click="ToggleWatcher_Click"
                     Style="{StaticResource SecondaryButtonStyle}"
                     Padding="10,6"
                     Margin="0,0,0,6" />
 
-            <Button Content="Uygulamadan Tamamen Çık"
+            <Button x:Name="ExitAppButton"
+                    Content="Quit Application"
                     Click="ExitApp_Click"
                     Style="{StaticResource DangerOutlineButtonStyle}"
                     Padding="10,6" />

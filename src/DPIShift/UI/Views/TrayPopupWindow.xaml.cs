@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using DPIShift.Core.Localization;
 using DPIShift.Core.Models;
 using DPIShift.Core.Native;
 using DPIShift.Core.Scaling;
@@ -12,7 +13,7 @@ public partial class TrayPopupWindow : Window
     {
         public required AppScaleProfile Profile { get; init; }
         public string DisplayName => Profile.DisplayName;
-        public string ScaleLabel => $"%{Profile.ScalePercent}";
+        public string ScaleLabel => Loc.IsTurkish ? $"%{Profile.ScalePercent}" : $"{Profile.ScalePercent}%";
     }
 
     private readonly ScalingOrchestrator _orchestrator;
@@ -66,7 +67,7 @@ public partial class TrayPopupWindow : Window
     private void PopulateState()
     {
         int sysScale = Win32Interop.GetPrimaryMonitorScalePercent();
-        SystemScaleText.Text = $" · Win %{sysScale}";
+        SystemScaleText.Text = Loc.IsTurkish ? $" · Win %{sysScale}" : $" · Win {sysScale}%";
 
         List<AppScaleProfile> active = _orchestrator.Profiles
             .Where(p => p.IsEnabled && p.ScalePercent != 100)
@@ -75,7 +76,11 @@ public partial class TrayPopupWindow : Window
             .ToList();
 
         int totalActive = _orchestrator.Profiles.Count(p => p.IsEnabled && p.ScalePercent != 100);
-        ActiveRulesText.Text = $"{totalActive} Aktif Kural";
+        ActiveRulesText.Text = Loc.IsTurkish ? $"{totalActive} Aktif Kural" : $"{totalActive} Active";
+
+        QuickLaunchHeaderText.Text = Loc.Instance.TrayQuickLaunchHeader;
+        OpenMainButton.Content = Loc.Instance.TrayOpenUiButton;
+        ExitAppButton.Content = Loc.Instance.TrayExitButton;
 
         if (active.Count > 0)
         {
@@ -88,8 +93,8 @@ public partial class TrayPopupWindow : Window
         }
 
         ToggleWatcherButton.Content = _orchestrator.Settings.EnableBackgroundRuntimeScaling
-            ? "Canlı Pencere İzleyiciyi Duraklat"
-            : "Canlı Pencere İzleyiciyi Etkinleştir";
+            ? Loc.Pick("Pause Live Window Watcher", "Canlı Pencere İzleyiciyi Duraklat")
+            : Loc.Pick("Enable Live Window Watcher", "Canlı Pencere İzleyiciyi Etkinleştir");
     }
 
     private void QuickLaunchApp_Click(object sender, RoutedEventArgs e)

@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
-        Title="DPIShift — Uygulama Bazlı Ekran Ölçeklendirme"
+        Title="{Binding Loc.WindowTitle}"
         Width="1120"
         Height="785"
         MinWidth="940"
@@ -67,13 +67,13 @@
                                    Foreground="#484852"
                                    Margin="8,0"
                                    VerticalAlignment="Center" />
-                        <TextBlock Text="Uygulama Bazlı DPI Ölçeklendirme"
+                        <TextBlock Text="{Binding Loc.HeaderSubtitle}"
                                    FontSize="12"
                                    Foreground="{StaticResource TextMutedBrush}"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Telemetry Readouts + Settings Trigger -->
+                    <!-- Telemetry Readouts + Language Switcher + Settings Trigger -->
                     <StackPanel Grid.Column="2"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Center"
@@ -99,12 +99,27 @@
                                 BorderThickness="1"
                                 CornerRadius="5"
                                 Padding="9,4"
-                                Margin="0,0,10,0">
+                                Margin="0,0,8,0">
                             <TextBlock Text="{Binding ActiveRulesBadgeText}"
                                        FontSize="11.5"
                                        FontWeight="SemiBold"
                                        Foreground="#F08A5D" />
                         </Border>
+
+                        <!-- Quick Language Toggle (EN / TR) -->
+                        <Button Command="{Binding ToggleLanguageCommand}"
+                                ToolTip="{Binding Loc.LanguageTooltip}"
+                                shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                MinHeight="28"
+                                Padding="9,4"
+                                Margin="0,0,7,0">
+                            <TextBlock Text="{Binding Loc.LanguageBadge}"
+                                       FontFamily="Cascadia Mono, Consolas, Segoe UI"
+                                       FontSize="11.5"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center" />
+                        </Button>
 
                         <!-- Settings Button (Hit-testable inside WindowChrome) -->
                         <Button Command="{Binding ToggleSettingsCommand}"
@@ -121,7 +136,7 @@
                                       Stretch="Uniform"
                                       VerticalAlignment="Center"
                                       Margin="0,0,6,0" />
-                                <TextBlock Text="Ayarlar" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Loc.SettingsButton}" FontSize="12" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -134,7 +149,7 @@
                         <Border Width="1" Background="#242429" Margin="0,11,0,11" />
 
                         <Button Click="MinimizeWindow_Click"
-                                ToolTip="Küçült"
+                                ToolTip="{Binding Loc.MinimizeTooltip}"
                                 Style="{StaticResource WindowCaptionButtonStyle}">
                             <Path Data="M 0,5 L 10,5"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -144,7 +159,7 @@
                         </Button>
 
                         <Button Click="MaximizeRestoreWindow_Click"
-                                ToolTip="Ekranı Kapla / Geri Yükle"
+                                ToolTip="{Binding Loc.MaximizeRestoreTooltip}"
                                 Style="{StaticResource WindowCaptionButtonStyle}">
                             <Grid Width="10" Height="10">
                                 <!-- Single square when Normal -->
@@ -162,7 +177,7 @@
                         </Button>
 
                         <Button Click="CloseWindow_Click"
-                                ToolTip="Kapat"
+                                ToolTip="{Binding Loc.CloseTooltip}"
                                 Style="{StaticResource WindowCloseButtonStyle}">
                             <Path Data="M 0.5,0.5 L 9.5,9.5 M 9.5,0.5 L 0.5,9.5"
                                   Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -218,7 +233,7 @@
                                       VerticalAlignment="Center"
                                       Margin="10,0,0,0"
                                       IsHitTestVisible="False" />
-                                <TextBlock Text="Uygulama ara..."
+                                <TextBlock Text="{Binding Loc.SearchPlaceholder}"
                                            Foreground="{StaticResource TextMutedBrush}"
                                            FontSize="12.5"
                                            Margin="30,0,8,0"
@@ -238,7 +253,7 @@
                             </Grid>
 
                             <Button Grid.Column="1"
-                                    ToolTip="Diskten çalıştırılabilir (.exe) uygulama seçin"
+                                    ToolTip="{Binding Loc.BrowseExeTooltip}"
                                     Command="{Binding BrowseExecutableCommand}"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Padding="10,6"
@@ -251,12 +266,12 @@
                                           Height="11"
                                           VerticalAlignment="Center"
                                           Margin="0,0,5,0" />
-                                    <TextBlock Text=".exe Seç" FontSize="12" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Loc.BrowseExeButton}" FontSize="12" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
 
                             <Button Grid.Column="2"
-                                    ToolTip="Uygulama ve çalışan pencere listesini yenile"
+                                    ToolTip="{Binding Loc.RefreshTooltip}"
                                     Command="{Binding RefreshAppsCommand}"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Width="33"
@@ -273,7 +288,7 @@
                             </Button>
                         </Grid>
 
-                        <!-- Recessed Segmented Filter Control (Tümü / Çalışan / Özel) -->
+                        <!-- Recessed Segmented Filter Control -->
                         <Border Grid.Row="1"
                                 Background="{StaticResource BgRecessedBrush}"
                                 BorderBrush="#25252B"
@@ -297,7 +312,7 @@
                                         </Style>
                                     </Button.Style>
                                     <TextBlock>
-                                        <Run Text="Tümü (" /><Run Text="{Binding TotalAppsCount, Mode=OneWay}" /><Run Text=")" />
+                                        <Run Text="{Binding Loc.TabAllPrefix, Mode=OneWay}" /><Run Text="{Binding TotalAppsCount, Mode=OneWay}" /><Run Text=")" />
                                     </TextBlock>
                                 </Button>
 
@@ -316,7 +331,7 @@
                                         </Style>
                                     </Button.Style>
                                     <TextBlock>
-                                        <Run Text="Çalışan (" /><Run Text="{Binding RunningAppsCount, Mode=OneWay}" /><Run Text=")" />
+                                        <Run Text="{Binding Loc.TabRunningPrefix, Mode=OneWay}" /><Run Text="{Binding RunningAppsCount, Mode=OneWay}" /><Run Text=")" />
                                     </TextBlock>
                                 </Button>
 
@@ -335,7 +350,7 @@
                                         </Style>
                                     </Button.Style>
                                     <TextBlock>
-                                        <Run Text="Özel (" /><Run Text="{Binding ConfiguredAppsCount, Mode=OneWay}" /><Run Text=")" />
+                                        <Run Text="{Binding Loc.TabConfiguredPrefix, Mode=OneWay}" /><Run Text="{Binding ConfiguredAppsCount, Mode=OneWay}" /><Run Text=")" />
                                     </TextBlock>
                                 </Button>
                             </UniformGrid>
@@ -343,7 +358,7 @@
 
                         <!-- Supported Only Switch -->
                         <Border Grid.Row="2" Margin="2,0,6,9">
-                            <CheckBox Content="Yalnızca ölçeklenebilir uygulamaları göster"
+                            <CheckBox Content="{Binding Loc.ShowSupportedOnlyLabel}"
                                       IsChecked="{Binding ShowSupportedOnly}"
                                       Style="{StaticResource ToggleSwitchCheckBoxStyle}"
                                       Foreground="{StaticResource TextSecondaryBrush}"
@@ -400,7 +415,7 @@
                                                              Fill="#5ED194"
                                                              Margin="6,1,0,0"
                                                              VerticalAlignment="Center"
-                                                             ToolTip="Şu anda çalışıyor"
+                                                             ToolTip="{Binding DataContext.Loc.RunningDotTooltip, RelativeSource={RelativeSource AncestorType=Window}}"
                                                              Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}" />
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,1.5,0,0">
@@ -440,7 +455,7 @@
                             <Border Background="#CC151517"
                                     CornerRadius="6"
                                     Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
-                                <TextBlock Text="Uygulamalar analiz ediliyor..."
+                                <TextBlock Text="{Binding Loc.LoadingAppsText}"
                                            Foreground="{StaticResource TextSecondaryBrush}"
                                            FontSize="12.5"
                                            VerticalAlignment="Center"
@@ -456,7 +471,7 @@
                     <StackPanel VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
                                 Visibility="{Binding HasSelectedApp, Converter={StaticResource InverseBoolToVis}}">
-                        <TextBlock Text="Sol listeden bir uygulama seçin veya '.exe Seç' ile ekleyin"
+                        <TextBlock Text="{Binding Loc.EmptySelectionText}"
                                    Foreground="{StaticResource TextMutedBrush}"
                                    FontSize="13.5"
                                    HorizontalAlignment="Center" />
@@ -551,7 +566,7 @@
                                                     Padding="8,2.5"
                                                     Margin="0,0,6,0">
                                                 <TextBlock FontSize="11.5" Foreground="#CECED6">
-                                                    <Run Text="Altyapı: " Foreground="#72727D" /><Run Text="{Binding SelectedApp.TechnologyBadge, Mode=OneWay}" FontWeight="SemiBold" />
+                                                    <Run Text="{Binding Loc.FrameworkPrefix, Mode=OneWay}" Foreground="#72727D" /><Run Text="{Binding SelectedApp.TechnologyBadge, Mode=OneWay}" FontWeight="SemiBold" />
                                                 </TextBlock>
                                             </Border>
 
@@ -561,7 +576,7 @@
                                                     CornerRadius="4"
                                                     Padding="8,2.5">
                                                 <TextBlock FontSize="11.5" Foreground="#CECED6">
-                                                    <Run Text="DPI Modu: " Foreground="#72727D" /><Run Text="{Binding SelectedApp.DpiAwarenessLabel, Mode=OneWay}" FontWeight="SemiBold" />
+                                                    <Run Text="{Binding Loc.DpiModePrefix, Mode=OneWay}" Foreground="#72727D" /><Run Text="{Binding SelectedApp.DpiAwarenessLabel, Mode=OneWay}" FontWeight="SemiBold" />
                                                 </TextBlock>
                                             </Border>
                                         </WrapPanel>
@@ -581,7 +596,7 @@
                                                   Height="10"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,6,0" />
-                                            <TextBlock Text="Konumu Aç" FontSize="12" />
+                                            <TextBlock Text="{Binding Loc.OpenLocationButton}" FontSize="12" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
@@ -690,7 +705,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Arayüz / DPI Ölçek Oranı"
+                                            <TextBlock Text="{Binding Loc.ScaleSectionTitle}"
                                                        FontSize="14"
                                                        FontWeight="Bold"
                                                        Foreground="{StaticResource TextPrimaryBrush}" />
@@ -709,15 +724,8 @@
                                                 Padding="10,2"
                                                 VerticalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                <TextBlock Text="%"
-                                                           FontFamily="Cascadia Mono, Consolas, Segoe UI"
-                                                           FontSize="15"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{StaticResource AccentBrush}"
-                                                           VerticalAlignment="Center"
-                                                           Margin="0,0,2,0" />
                                                 <TextBox Text="{Binding DraftScaleText, UpdateSourceTrigger=PropertyChanged}"
-                                                         Width="54"
+                                                         Width="48"
                                                          Background="Transparent"
                                                          BorderThickness="0"
                                                          Foreground="{StaticResource TextPrimaryBrush}"
@@ -727,6 +735,13 @@
                                                          FontSize="16"
                                                          FontWeight="Bold"
                                                          Padding="2,4" />
+                                                <TextBlock Text="%"
+                                                           FontFamily="Cascadia Mono, Consolas, Segoe UI"
+                                                           FontSize="15"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{StaticResource AccentBrush}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="2,0,0,0" />
                                             </StackPanel>
                                         </Border>
                                     </Grid>
@@ -752,17 +767,17 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="%75" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
-                                        <TextBlock Grid.Column="1" Text="%100" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#888894" />
-                                        <TextBlock Grid.Column="2" Text="%125" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
-                                        <TextBlock Grid.Column="3" Text="%150" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
-                                        <TextBlock Grid.Column="4" Text="%175" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
-                                        <TextBlock Grid.Column="5" Text="%200" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
-                                        <TextBlock Grid.Column="6" Text="%225" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
+                                        <TextBlock Grid.Column="0" Text="75%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
+                                        <TextBlock Grid.Column="1" Text="100%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#888894" />
+                                        <TextBlock Grid.Column="2" Text="125%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
+                                        <TextBlock Grid.Column="3" Text="150%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
+                                        <TextBlock Grid.Column="4" Text="175%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
+                                        <TextBlock Grid.Column="5" Text="200%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
+                                        <TextBlock Grid.Column="6" Text="225%" FontFamily="Cascadia Mono, Consolas" FontSize="10" Foreground="#5E5E68" />
                                     </Grid>
 
                                     <!-- Preset Scale Chips -->
-                                    <TextBlock Text="HIZLI ÖLÇEK SEÇİMİ"
+                                    <TextBlock Text="{Binding Loc.QuickPresetsHeader}"
                                                FontSize="10.5"
                                                FontWeight="Bold"
                                                Foreground="{StaticResource TextMutedBrush}"
@@ -814,10 +829,10 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel VerticalAlignment="Center" Margin="0,0,18,0">
-                                                <TextBlock Text="Ölçek Karşılaştırması"
+                                                <TextBlock Text="{Binding Loc.ScaleComparisonLabel}"
                                                            FontSize="11"
                                                            Foreground="{StaticResource TextMutedBrush}" />
-                                                <TextBlock Text="Gerçek Vektörel Çizim"
+                                                <TextBlock Text="{Binding Loc.TrueVectorRenderingLabel}"
                                                            FontSize="11.5"
                                                            FontWeight="SemiBold"
                                                            Foreground="#C8C8D2"
@@ -829,27 +844,27 @@
                                                         HorizontalAlignment="Left"
                                                         CornerRadius="2.5"
                                                         Background="#383842"
-                                                        ToolTip="Baz %100 Referans Boyutu"
+                                                        ToolTip="{Binding Loc.BaseReferenceTooltip}"
                                                         Margin="0,0,0,5" />
                                                 <Border Width="{Binding PreviewBarWidth}"
                                                         Height="7"
                                                         HorizontalAlignment="Left"
                                                         CornerRadius="3.5"
                                                         Background="{StaticResource AccentBrush}"
-                                                        ToolTip="Hedef Uygulama Ölçeği" />
+                                                        ToolTip="{Binding Loc.TargetScaleTooltip}" />
                                             </StackPanel>
                                         </Grid>
                                     </Border>
 
                                     <!-- Contextual Integration Switches -->
                                     <StackPanel>
-                                        <CheckBox Content="Masaüstü, Başlat Menüsü ve Görev Çubuğu kısayollarını otomatik güncelle (Yedeklenir)"
+                                        <CheckBox Content="{Binding Loc.UpdateShortcutsToggle}"
                                                   IsChecked="{Binding DraftUpdateShortcuts}"
                                                   Style="{StaticResource ToggleSwitchCheckBoxStyle}"
                                                   Margin="0,0,0,8"
                                                   Visibility="{Binding ShowShortcutIntegrationOption, Converter={StaticResource BoolToVis}}" />
 
-                                        <CheckBox Content="Uygulama penceresi açıldığında arka planda otomatik olarak bu DPI ölçeğini uygula"
+                                        <CheckBox Content="{Binding Loc.AutoApplyRuntimeToggle}"
                                                   IsChecked="{Binding DraftAutoApplyOnOpen}"
                                                   Style="{StaticResource ToggleSwitchCheckBoxStyle}"
                                                   Margin="0,0,0,4"
@@ -894,7 +909,7 @@
                                               Stretch="Uniform"
                                               VerticalAlignment="Center"
                                               Margin="0,0,7,0" />
-                                        <TextBlock Text="Uygula ve Şimdi Yeniden Başlat" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Loc.ApplyAndRestartButton}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
 
@@ -910,7 +925,7 @@
                                               Stretch="Uniform"
                                               VerticalAlignment="Center"
                                               Margin="0,0,7,0" />
-                                        <TextBlock Text="Ölçekli Başlat" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Loc.LaunchScaledButton}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
 
@@ -929,7 +944,7 @@
                                               Stretch="Uniform"
                                               VerticalAlignment="Center"
                                               Margin="0,0,7,0" />
-                                        <TextBlock Text="Masaüstü Kısayolu" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Loc.DesktopShortcutButton}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
 
@@ -948,7 +963,7 @@
                                               Stretch="Uniform"
                                               VerticalAlignment="Center"
                                               Margin="0,0,7,0" />
-                                        <TextBlock Text="Varsayılana Döndür (%100)" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding Loc.ResetToDefaultButton}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Button>
                             </WrapPanel>
@@ -973,7 +988,7 @@
                                 </Grid.RowDefinitions>
 
                                 <Grid Grid.Row="0" Margin="0,0,0,18">
-                                    <TextBlock Text="Uygulama ve Sistem Tepsisi"
+                                    <TextBlock Text="{Binding Loc.SettingsDrawerTitle}"
                                                FontSize="15"
                                                FontWeight="Bold"
                                                VerticalAlignment="Center" />
@@ -990,62 +1005,113 @@
                                                   Height="8"
                                                   VerticalAlignment="Center"
                                                   Margin="0,0,6,0" />
-                                            <TextBlock Text="Kapat" FontSize="12" />
+                                            <TextBlock Text="{Binding Loc.CloseDrawerButton}" FontSize="12" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
 
                                 <StackPanel Grid.Row="1">
-                                    <TextBlock Text="SİSTEM TEPSİSİ (SYSTEM TRAY)"
+                                    <TextBlock Text="{Binding Loc.LanguageSectionHeader}"
+                                               FontSize="10.5"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource TextMutedBrush}"
+                                               Margin="0,0,0,8" />
+
+                                    <Border Background="{StaticResource BgRecessedBrush}"
+                                            BorderBrush="#25252B"
+                                            BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="3"
+                                            Margin="0,0,0,16">
+                                        <UniformGrid Columns="2">
+                                            <Button Content="English (Default)"
+                                                    Command="{Binding SetLanguageCommand}"
+                                                    CommandParameter="en">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource SegmentedTabButtonStyle}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Loc.IsEnglish}" Value="True">
+                                                                <Setter Property="Background" Value="#27272E" />
+                                                                <Setter Property="BorderBrush" Value="#383842" />
+                                                                <Setter Property="Foreground" Value="#F2F2F4" />
+                                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <Button Content="Türkçe"
+                                                    Command="{Binding SetLanguageCommand}"
+                                                    CommandParameter="tr">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource SegmentedTabButtonStyle}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Loc.IsTrSelected}" Value="True">
+                                                                <Setter Property="Background" Value="#27272E" />
+                                                                <Setter Property="BorderBrush" Value="#383842" />
+                                                                <Setter Property="Foreground" Value="#F2F2F4" />
+                                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </UniformGrid>
+                                    </Border>
+
+                                    <Border Height="1" Background="#27272E" Margin="0,0,0,14" />
+
+                                    <TextBlock Text="{Binding Loc.TraySectionHeader}"
                                                FontSize="10.5"
                                                FontWeight="Bold"
                                                Foreground="{StaticResource TextMutedBrush}"
                                                Margin="0,0,0,10" />
 
-                                    <CheckBox Content="Pencere kapatıldığında (X) sistem tepsisine küçült"
+                                    <CheckBox Content="{Binding Loc.CloseToTrayToggle}"
                                               IsChecked="{Binding CloseToTray}"
                                               Style="{StaticResource ToggleSwitchCheckBoxStyle}"
                                               Margin="0,0,0,12" />
 
-                                    <CheckBox Content="Simge durumuna küçültüldüğünde (—) tepsiye gizle"
+                                    <CheckBox Content="{Binding Loc.MinimizeToTrayToggle}"
                                               IsChecked="{Binding MinimizeToTray}"
                                               Style="{StaticResource ToggleSwitchCheckBoxStyle}"
                                               Margin="0,0,0,12" />
 
-                                    <CheckBox Content="Windows açılışında sistem tepsisinde otomatik başlat"
+                                    <CheckBox Content="{Binding Loc.StartWithWindowsToggle}"
                                               IsChecked="{Binding StartWithWindows}"
                                               Style="{StaticResource ToggleSwitchCheckBoxStyle}"
-                                              Margin="0,0,0,20" />
+                                              Margin="0,0,0,18" />
 
-                                    <Border Height="1" Background="#27272E" Margin="0,0,0,16" />
+                                    <Border Height="1" Background="#27272E" Margin="0,0,0,14" />
 
-                                    <TextBlock Text="PERFORMANS VE ARKA PLAN İZLEYİCİ"
+                                    <TextBlock Text="{Binding Loc.PerformanceSectionHeader}"
                                                FontSize="10.5"
                                                FontWeight="Bold"
                                                Foreground="{StaticResource TextMutedBrush}"
                                                Margin="0,0,0,10" />
 
-                                    <CheckBox Content="Canlı pencere DPI izleyicisini etkin tut (%0 boşta CPU)"
+                                    <CheckBox Content="{Binding Loc.EnableWatcherToggle}"
                                               IsChecked="{Binding EnableBackgroundRuntimeScaling}"
                                               Style="{StaticResource ToggleSwitchCheckBoxStyle}"
                                               Margin="0,0,0,8" />
 
-                                    <TextBlock Text="Sürekli döngü (polling) veya DLL enjeksiyonu kullanılmaz. Oyun performansını ve hile koruma sistemlerini etkilemez; etkin canlı kural yoksa kanca devre dışı kalır."
+                                    <TextBlock Text="{Binding Loc.WatcherExplanationText}"
                                                Foreground="{StaticResource TextSecondaryBrush}"
                                                FontSize="11.5"
                                                LineHeight="17"
                                                TextWrapping="Wrap"
-                                               Margin="0,0,0,20" />
+                                               Margin="0,0,0,18" />
 
-                                    <Border Height="1" Background="#27272E" Margin="0,0,0,16" />
+                                    <Border Height="1" Background="#27272E" Margin="0,0,0,14" />
 
-                                    <TextBlock Text="KURALLARI SIFIRLAMA"
+                                    <TextBlock Text="{Binding Loc.ResetSectionHeader}"
                                                FontSize="10.5"
                                                FontWeight="Bold"
                                                Foreground="{StaticResource TextMutedBrush}"
                                                Margin="0,0,0,10" />
 
-                                    <Button Content="Tüm Uygulama Ölçeklerini Sıfırla ve Varsayılana Döndür"
+                                    <Button Content="{Binding Loc.ResetAllRulesButton}"
                                             Command="{Binding ResetAllRulesCommand}"
                                             Style="{StaticResource DangerOutlineButtonStyle}"
                                             HorizontalAlignment="Stretch" />
@@ -1053,7 +1119,7 @@
 
                                 <StackPanel Grid.Row="2">
                                     <Border Height="1" Background="#27272E" Margin="0,0,0,12" />
-                                    <Button Content="DPIShift'i Tamamen Kapat (Tepsiden Çık)"
+                                    <Button Content="{Binding Loc.CompleteExitButton}"
                                             Click="CompletelyExit_Click"
                                             Style="{StaticResource DangerOutlineButtonStyle}"
                                             HorizontalAlignment="Stretch" />

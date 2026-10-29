@@ -42,6 +42,7 @@ public sealed class RegistryRunBackupEntry
 
 public sealed class AppSettings
 {
+    public string Language { get; set; } = "en";
     public bool CloseToTray { get; set; } = true;
     public bool MinimizeToTray { get; set; } = false;
     public bool StartWithWindows { get; set; } = false;

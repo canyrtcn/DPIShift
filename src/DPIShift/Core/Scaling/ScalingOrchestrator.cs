@@ -1,3 +1,4 @@
+using DPIShift.Core.Localization;
 using DPIShift.Core.Models;
 using DPIShift.Core.Persistence;
 
@@ -28,6 +29,7 @@ public sealed class ScalingOrchestrator
         _shortcutService = shortcutService;
         _runtimeWatcher = runtimeWatcher;
         _configuration = _configStore.Load();
+        Loc.Instance.SetLanguage(_configuration.Settings.Language);
     }
 
     public DpiShiftConfiguration Configuration => _configuration;
@@ -60,7 +62,9 @@ public sealed class ScalingOrchestrator
             return new ScalingActionResult
             {
                 Success = false,
-                Message = "Bu uygulama teknolojisi bağımsız vektörel DPI ölçeklendirmesini desteklemiyor."
+                Message = Loc.Pick(
+                    "This application framework does not support independent vector DPI scaling.",
+                    "Bu uygulama teknolojisi bağımsız vektörel DPI ölçeklendirmesini desteklemiyor.")
             };
         }
 
@@ -172,7 +176,9 @@ public sealed class ScalingOrchestrator
         return new ScalingActionResult
         {
             Success = true,
-            Message = "Ölçeklendirme kuralı kaldırıldı ve uygulama varsayılan (%100 / Sistem) davranışına döndürüldü."
+            Message = Loc.Pick(
+                "Scaling rule removed and application restored to default (100% / System) behavior.",
+                "Ölçeklendirme kuralı kaldırıldı ve uygulama varsayılan (%100 / Sistem) davranışına döndürüldü.")
         };
     }
 
@@ -211,29 +217,49 @@ public sealed class ScalingOrchestrator
         if (app.Compatibility.DeliveryMode == ScalingDeliveryMode.LiveRuntimeDpiMessage)
         {
             return liveWindows > 0
-                ? $"%{scalePercent} vektörel DPI ölçeği açık olan {liveWindows} pencereye anında uygulandı."
-                : $"%{scalePercent} kuralı kaydedildi. {app.DisplayName} açıldığında otomatik uygulanacak.";
+                ? Loc.Pick(
+                    $"{scalePercent}% vector DPI scale applied immediately to {liveWindows} open window(s).",
+                    $"%{scalePercent} vektörel DPI ölçeği açık olan {liveWindows} pencereye anında uygulandı.")
+                : Loc.Pick(
+                    $"{scalePercent}% rule saved. It will be applied automatically when {app.DisplayName} opens.",
+                    $"%{scalePercent} kuralı kaydedildi. {app.DisplayName} açıldığında otomatik uygulanacak.");
         }
 
         if (app.Compatibility.DeliveryMode == ScalingDeliveryMode.JetBrainsVmOptions)
         {
-            string baseText = configWritten
+            string baseEn = configWritten
+                ? $"{app.DisplayName} .vmoptions configuration updated to {scalePercent}% HiDPI."
+                : $"{scalePercent}% rule saved for {app.DisplayName}.";
+            string baseTr = configWritten
                 ? $"{app.DisplayName} .vmoptions yapılandırması %{scalePercent} HiDPI olarak güncellendi."
                 : $"{app.DisplayName} için %{scalePercent} kuralı kaydedildi.";
+
             return needsRestart
-                ? $"{baseText} Değişikliğin aktif olması için uygulamayı yeniden başlatın."
-                : $"{baseText} Sonraki açılışta %{scalePercent} ölçeğinde başlayacak.";
+                ? Loc.Pick(
+                    $"{baseEn} Restart the application for changes to take effect.",
+                    $"{baseTr} Değişikliğin aktif olması için uygulamayı yeniden başlatın.")
+                : Loc.Pick(
+                    $"{baseEn} It will launch at {scalePercent}% scale next time.",
+                    $"{baseTr} Sonraki açılışta %{scalePercent} ölçeğinde başlayacak.");
         }
 
         if (updatedShortcuts > 0)
         {
             return needsRestart
-                ? $"%{scalePercent} ölçeği kaydedildi ({updatedShortcuts} kısayol güncellendi). Aktif olması için uygulamayı yeniden başlatın."
-                : $"%{scalePercent} ölçeği kaydedildi ve {updatedShortcuts} kısayola entegre edildi.";
+                ? Loc.Pick(
+                    $"{scalePercent}% scale saved ({updatedShortcuts} shortcut(s) updated). Restart the application to apply.",
+                    $"%{scalePercent} ölçeği kaydedildi ({updatedShortcuts} kısayol güncellendi). Aktif olması için uygulamayı yeniden başlatın.")
+                : Loc.Pick(
+                    $"{scalePercent}% scale saved and integrated into {updatedShortcuts} shortcut(s).",
+                    $"%{scalePercent} ölçeği kaydedildi ve {updatedShortcuts} kısayola entegre edildi.");
         }
 
         return needsRestart
-            ? $"%{scalePercent} ölçeği kaydedildi. Uygulama açık olduğu için 'Yeniden Başlat ve Uygula' ile hemen etkinleştirebilirsiniz."
-            : $"%{scalePercent} ölçeği kaydedildi. 'Ölçekli Başlat' veya masaüstü kısayolu ile çalıştırabilirsiniz.";
+            ? Loc.Pick(
+                $"{scalePercent}% scale saved. Since the app is running, click 'Apply & Restart Now' to activate immediately.",
+                $"%{scalePercent} ölçeği kaydedildi. Uygulama açık olduğu için 'Yeniden Başlat ve Uygula' ile hemen etkinleştirebilirsiniz.")
+            : Loc.Pick(
+                $"{scalePercent}% scale saved. Use 'Launch Scaled' or a desktop shortcut to start it.",
+                $"%{scalePercent} ölçeği kaydedildi. 'Ölçekli Başlat' veya masaüstü kısayolu ile çalıştırabilirsiniz.");
     }
 }
