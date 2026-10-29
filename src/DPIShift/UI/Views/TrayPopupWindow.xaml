@@ -1,0 +1,120 @@
+<Window x:Class="DPIShift.UI.Views.TrayPopupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DPIShift Menü"
+        Width="276"
+        SizeToContent="Height"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Deactivated="Window_Deactivated">
+    <Border Background="#18181B"
+            BorderBrush="#32323A"
+            BorderThickness="1"
+            CornerRadius="8"
+            Margin="6"
+            Padding="10">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="14" ShadowDepth="4" Opacity="0.6" Color="#000000" />
+        </Border.Effect>
+        <StackPanel>
+            <!-- Tray Header -->
+            <Grid Margin="4,2,4,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="DPIShift"
+                               Foreground="#F1F1F3"
+                               FontWeight="Bold"
+                               FontSize="13" />
+                    <TextBlock x:Name="SystemScaleText"
+                               Text=" · Win %100"
+                               Foreground="#6E6E78"
+                               FontSize="11.5"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                <Border Grid.Column="1"
+                        Background="#26201D"
+                        BorderBrush="#543528"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="7,2">
+                    <TextBlock x:Name="ActiveRulesText"
+                               Text="0 Kural"
+                               Foreground="#F08A5D"
+                               FontSize="11"
+                               FontWeight="SemiBold" />
+                </Border>
+            </Grid>
+
+            <Border Height="1" Background="#27272E" Margin="0,0,0,6" />
+
+            <!-- Quick Launch Scaled Profiles Section -->
+            <StackPanel x:Name="QuickLaunchSection" Visibility="Collapsed">
+                <TextBlock Text="ÖLÇEKLİ HIZLI BAŞLAT"
+                           Foreground="#6B6B75"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Margin="6,2,6,4" />
+                <ItemsControl x:Name="QuickLaunchItems">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Click="QuickLaunchApp_Click"
+                                    Tag="{Binding}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    MinHeight="28"
+                                    HorizontalContentAlignment="Stretch"
+                                    Padding="8,5"
+                                    Margin="0,1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               Foreground="#E4E4EA"
+                                               FontSize="12.3"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding ScaleLabel}"
+                                               FontFamily="Cascadia Mono, Consolas, Segoe UI"
+                                               Foreground="#F08A5D"
+                                               FontWeight="SemiBold"
+                                               FontSize="11.5"
+                                               Margin="8,0,0,0" />
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Border Height="1" Background="#27272E" Margin="0,6,0,6" />
+            </StackPanel>
+
+            <!-- Menu Actions -->
+            <Button Content="DPIShift Arayüzünü Aç"
+                    Click="OpenMainWindow_Click"
+                    Style="{StaticResource PrimaryButtonStyle}"
+                    Padding="10,7"
+                    Margin="0,0,0,6" />
+
+            <Button x:Name="ToggleWatcherButton"
+                    Content="Canlı İzleyiciyi Duraklat"
+                    Click="ToggleWatcher_Click"
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Padding="10,6"
+                    Margin="0,0,0,6" />
+
+            <Button Content="Uygulamadan Tamamen Çık"
+                    Click="ExitApp_Click"
+                    Style="{StaticResource DangerOutlineButtonStyle}"
+                    Padding="10,6" />
+        </StackPanel>
+    </Border>
+</Window>
