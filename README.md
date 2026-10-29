@@ -43,7 +43,7 @@ Unlike tools that merely resize windows, apply blurry bitmap stretching, or rely
 - **True Vector HiDPI Scaling:** Applies framework-native scaling rather than blurry bitmap magnification.
 - **Shortcut & Profile Integration:** Automatically backs up and updates Desktop, Start Menu, and Taskbar shortcuts.
 - **Lossless One-Click Rollback:** Restores modified shortcuts, configuration files, and runtime DPI states back to `100%` default behavior at any time.
-- **Lightweight System Tray Mode:** Runs quietly in the Windows system tray with minimal memory footprint, **0% idle CPU usage**, and optional startup on Windows login.
+- **Lightweight System Tray Mode:** Runs quietly in the Windows system tray with minimal memory footprint, **Near-zero idle CPU usage**, and optional startup on Windows login.
 - **Game & Anti-Cheat Safe:** Does not use DLL injection, global hooks, or administrator privileges (`UAC`), ensuring zero impact on gaming performance or anti-cheat software.
 - **Bilingual Interface:** Built-in **English** (default) and **Turkish** (`EN / TR`) interface language support.
 
