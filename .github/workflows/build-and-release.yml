@@ -1,4 +1,4 @@
-name: Build, Test & Release
+name: Build & Release
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build-windows:
-    name: Windows x64 Single-EXE Build & Test
+    name: Windows x64 Single-EXE Build
     runs-on: windows-latest
 
     steps:
@@ -25,9 +25,14 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Run build, test, and single-file EXE packaging
+      - name: Publish Single-File Executables
         shell: pwsh
-        run: ./build.ps1 -Configuration Release -Runtime win-x64
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          dotnet publish src/DPIShift/DPIShift.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o artifacts/sc
+          Copy-Item artifacts/sc/DPIShift.exe dist/DPIShift.exe -Force
+          dotnet publish src/DPIShift/DPIShift.csproj -c Release -r win-x64 --no-self-contained -p:SelfContained=false -p:PublishSingleFile=true -p:DebugType=none -p:DebugSymbols=false -o artifacts/light
+          Copy-Item artifacts/light/DPIShift.exe dist/DPIShift-light.exe -Force
 
       - name: Upload Release Executables Artifact
         uses: actions/upload-artifact@v4
@@ -36,7 +41,6 @@ jobs:
           path: |
             dist/DPIShift.exe
             dist/DPIShift-light.exe
-            dist/SHA256SUMS.txt
 
       - name: Publish GitHub Release on Version Tag
         if: startsWith(github.ref, 'refs/tags/v')
@@ -46,4 +50,3 @@ jobs:
           files: |
             dist/DPIShift.exe
             dist/DPIShift-light.exe
-            dist/SHA256SUMS.txt

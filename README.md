@@ -83,18 +83,14 @@ Unlike tools that merely resize windows, apply blurry bitmap stretching, or rely
 - Windows 10 (1809+) or Windows 11
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download) (or newer)
 
-### Build & Package
+### Build & Publish
 
 ```powershell
-# Runs automated tests and produces single-file executables in dist\
-powershell -ExecutionPolicy Bypass -File .\build.ps1
-```
-
-To build or run tests manually:
-
-```powershell
+# Build Release
 dotnet build DPIShift.sln -c Release
-dotnet test DPIShift.sln -c Release
+
+# Publish standalone single-file executable
+dotnet publish src/DPIShift/DPIShift.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true
 ```
 
 ---
