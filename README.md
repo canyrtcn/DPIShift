@@ -98,3 +98,5 @@ dotnet publish src/DPIShift/DPIShift.csproj -c Release -r win-x64 --self-contain
 ## License
 
 Licensed under the [MIT License](LICENSE).
+
+For bug reports and feature requests, please use [GitHub Issues](../../issues).
